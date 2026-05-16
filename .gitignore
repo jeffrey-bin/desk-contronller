@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+out/
+build/
+.vite/
+*.tsbuildinfo
+
+# Electron packaging
+release/
+*.dmg
+*.exe
+*.app
+*.snap
+*.deb
+*.rpm
+*.AppImage
+
+# Logs & test coverage
+*.log
+logs/
+coverage/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

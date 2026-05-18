@@ -1,12 +1,19 @@
+export type VideoCodecPreference = 'H264' | 'VP8' | 'VP9'
+
 export function preferH264(sdp: string): string {
+  return preferVideoCodec(sdp, 'H264')
+}
+
+export function preferVideoCodec(sdp: string, codec: VideoCodecPreference): string {
   const lines = sdp.split(/\r?\n/)
-  const h264Payloads = new Set<string>()
+  const preferredPayloads = new Set<string>()
   const rtxAptPayloads = new Map<string, string>()
+  const codecPattern = new RegExp(`^a=rtpmap:(\\d+)\\s+${codec}/`, 'i')
 
   for (const line of lines) {
-    const match = /^a=rtpmap:(\d+)\s+H264\//i.exec(line)
+    const match = codecPattern.exec(line)
     if (match?.[1] !== undefined) {
-      h264Payloads.add(match[1])
+      preferredPayloads.add(match[1])
     }
 
     const fmtpMatch = /^a=fmtp:(\d+)\s+(.+)$/i.exec(line)
@@ -19,7 +26,7 @@ export function preferH264(sdp: string): string {
     }
   }
 
-  if (h264Payloads.size === 0) {
+  if (preferredPayloads.size === 0) {
     return sdp
   }
 
@@ -39,7 +46,7 @@ export function preferH264(sdp: string): string {
   const preferred: string[] = []
   const preferredSet = new Set<string>()
   for (const payload of payloads) {
-    if (!h264Payloads.has(payload)) {
+    if (!preferredPayloads.has(payload)) {
       continue
     }
 

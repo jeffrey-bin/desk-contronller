@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 type SdpMungeModule = {
   preferH264(sdp: string): string
+  preferVideoCodec(sdp: string, codec: 'H264' | 'VP8' | 'VP9'): string
 }
 
 const sdpMungePath = '../src/renderer/shared/webrtc/sdp-munge.js'
@@ -56,5 +57,22 @@ describe('preferH264', () => {
     ].join('\n')
 
     expect(preferH264(sdp)).toBe(sdp)
+  })
+
+  it('can prefer VP8 for Android RN viewers', async () => {
+    const { preferVideoCodec } = (await import(sdpMungePath)) as SdpMungeModule
+    const sdp = [
+      'v=0',
+      'm=video 9 UDP/TLS/RTP/SAVPF 97 98 99 100',
+      'a=rtpmap:97 H264/90000',
+      'a=rtpmap:98 rtx/90000',
+      'a=fmtp:98 apt=97',
+      'a=rtpmap:99 VP8/90000',
+      'a=rtpmap:100 rtx/90000',
+      'a=fmtp:100 apt=99',
+      '',
+    ].join('\n')
+
+    expect(preferVideoCodec(sdp, 'VP8')).toContain('m=video 9 UDP/TLS/RTP/SAVPF 99 100 97 98')
   })
 })

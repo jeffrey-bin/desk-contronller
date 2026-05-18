@@ -35,13 +35,13 @@ function handleMessage(socket, raw) {
 
   const peer = peers.get(socket)
   if (!peer) {
-    if (message.t !== 'join-room') {
+    if (message.t !== 'join-room' && message.t !== 'hello') {
       return
     }
 
     const joined = {
       socket,
-      roomId: message.roomId,
+      roomId: message.t === 'join-room' ? message.roomId : roomId,
       role: message.role,
       clientId: message.clientId,
     }

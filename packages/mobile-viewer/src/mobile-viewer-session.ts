@@ -6,10 +6,14 @@ export type MobileViewerState = 'idle' | 'pairing' | 'negotiating' | 'streaming'
 export type MobileRemoteStream = {
   id: string
   videoTracks: number
+  streamURL?: string
 }
 
 export type MobilePeerAdapter = {
-  acceptOffer(sdp: string): Promise<{ answerSdp: string; stream: MobileRemoteStream }>
+  acceptOffer(
+    sdp: string,
+    onIceCandidate: (candidate: Extract<SignalingMessage, { t: 'ice' }>['candidate']) => void,
+  ): Promise<{ answerSdp: string; stream: MobileRemoteStream }>
   addIceCandidate(candidate: Extract<SignalingMessage, { t: 'ice' }>['candidate']): Promise<void>
 }
 
@@ -85,7 +89,13 @@ export class MobileViewerSession {
 
     if (message.t === 'offer') {
       this.#setState('negotiating')
-      const accepted = await this.#peer.acceptOffer(message.sdp)
+      const accepted = await this.#peer.acceptOffer(message.sdp, (candidate) => {
+        this.#transport.send({
+          v: PROTOCOL_VERSION,
+          t: 'ice',
+          candidate,
+        })
+      })
       this.#stream = accepted.stream
       this.#transport.send({
         v: PROTOCOL_VERSION,

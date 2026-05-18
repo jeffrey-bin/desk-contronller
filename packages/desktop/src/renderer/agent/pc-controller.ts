@@ -2,6 +2,7 @@ import {
   DC_KEYBOARD_LABEL,
   DC_MOUSE_LABEL,
   PROTOCOL_VERSION,
+  VIDEO_RN_ANDROID_SCALE_DOWN_BY,
   parseKeyMsg,
   parseMouseMsg,
   type SignalingMessage,
@@ -9,11 +10,15 @@ import {
 
 import type { AgentApi, AgentEvent } from '../../shared/api-types.js'
 import { createRemoteIceBuffer, type RemoteIceBuffer } from '../shared/webrtc/remote-ice-buffer.js'
-import { preferH264 } from '../shared/webrtc/sdp-munge.js'
+import { preferVideoCodec, type VideoCodecPreference } from '../shared/webrtc/sdp-munge.js'
 import { tuneVideoSender } from '../shared/webrtc/sender-params.js'
 
 export type AgentPeerController = {
   stop(): void
+}
+
+export type AgentPeerControllerOptions = {
+  viewerId?: string
 }
 
 type WireIceCandidate = Extract<SignalingMessage, { t: 'ice' }>['candidate']
@@ -21,16 +26,21 @@ type WireIceCandidate = Extract<SignalingMessage, { t: 'ice' }>['candidate']
 export async function createAgentPeerController(
   api: AgentApi,
   stream: MediaStream,
+  options: AgentPeerControllerOptions = {},
 ): Promise<AgentPeerController> {
   const pc = new RTCPeerConnection()
   const remoteIce = createRemoteIceBuffer(pc)
+  const isAndroidRnViewer = options.viewerId?.startsWith('rn-android-viewer-') === true
   const unsubscribe = api.onEvent((event) => {
     void handleAgentEvent(pc, event, remoteIce)
   })
 
   for (const track of stream.getVideoTracks()) {
     const sender = pc.addTrack(track, stream)
-    void tuneVideoSender(sender)
+    void tuneVideoSender(
+      sender,
+      isAndroidRnViewer ? { scaleResolutionDownBy: VIDEO_RN_ANDROID_SCALE_DOWN_BY } : {},
+    )
   }
 
   const mouseChannel = pc.createDataChannel(DC_MOUSE_LABEL, {
@@ -76,9 +86,13 @@ export async function createAgentPeerController(
   }
 
   const offer = await pc.createOffer()
+  const preferredCodec = selectVideoCodecPreference(options.viewerId)
+  console.info(
+    `Using ${preferredCodec} video codec preference for viewer ${options.viewerId ?? 'unknown'}`,
+  )
   const mungedOffer = new RTCSessionDescription({
     type: offer.type,
-    sdp: preferH264(offer.sdp ?? ''),
+    sdp: preferVideoCodec(offer.sdp ?? '', preferredCodec),
   })
   await pc.setLocalDescription(mungedOffer)
   await api.sendSignal({ v: PROTOCOL_VERSION, t: 'offer', sdp: mungedOffer.sdp })
@@ -91,6 +105,10 @@ export async function createAgentPeerController(
       pc.close()
     },
   }
+}
+
+export function selectVideoCodecPreference(viewerId: string | undefined): VideoCodecPreference {
+  return viewerId?.startsWith('rn-android-viewer-') === true ? 'VP8' : 'H264'
 }
 
 async function handleAgentEvent(

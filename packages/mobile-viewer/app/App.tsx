@@ -2,6 +2,7 @@ import type React from 'react'
 import { useMemo, useRef, useState } from 'react'
 import {
   Pressable,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -10,8 +11,9 @@ import {
   TextInput,
   View,
 } from 'react-native'
+import { RTCView } from 'react-native-webrtc'
 
-import { MobileRelayTransport } from '../src/relay-transport'
+import { MobileEmbeddedTransport } from '../src/embedded-transport'
 import {
   MobileViewerSession,
   type MobileRemoteStream,
@@ -47,11 +49,10 @@ export default function App(): React.JSX.Element {
       return
     }
 
-    const transport = new MobileRelayTransport({
+    const transport = new MobileEmbeddedTransport({
       url: `ws://${host.trim()}:${port.trim()}`,
-      roomId: pairCode.trim(),
       role: 'viewer',
-      clientId: `rn-viewer-${Date.now()}`,
+      clientId: `rn-${Platform.OS}-viewer-${Date.now()}`,
       logger: {
         warn: setMessage,
       },
@@ -162,12 +163,24 @@ export default function App(): React.JSX.Element {
         </View>
 
         <View testID="stream-card" style={styles.streamCard}>
-          <Text style={styles.streamTitle}>
-            {snapshot.stream ? snapshot.stream.id : 'Waiting for remote stream'}
-          </Text>
-          <Text style={styles.streamMeta}>
-            {snapshot.stream ? `${snapshot.stream.videoTracks} video track` : message}
-          </Text>
+          {snapshot.stream?.streamURL ? (
+            <RTCView
+              testID="remote-video"
+              accessibilityLabel="remote-video"
+              objectFit="contain"
+              streamURL={snapshot.stream.streamURL}
+              style={styles.remoteVideo}
+            />
+          ) : (
+            <>
+              <Text style={styles.streamTitle}>
+                {snapshot.stream ? snapshot.stream.id : 'Waiting for remote stream'}
+              </Text>
+              <Text style={styles.streamMeta}>
+                {snapshot.stream ? `${snapshot.stream.videoTracks} video track` : message}
+              </Text>
+            </>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -300,9 +313,16 @@ const styles = StyleSheet.create({
   streamCard: {
     backgroundColor: '#080D1F',
     borderRadius: 8,
-    minHeight: 150,
+    minHeight: 240,
     justifyContent: 'center',
+    overflow: 'hidden',
     padding: 18,
+  },
+  remoteVideo: {
+    alignSelf: 'stretch',
+    aspectRatio: 16 / 10,
+    backgroundColor: '#000000',
+    borderRadius: 6,
   },
   streamTitle: {
     color: '#FFFFFF',

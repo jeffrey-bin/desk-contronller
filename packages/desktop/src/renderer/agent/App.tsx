@@ -12,12 +12,20 @@ export function App(): JSX.Element {
   const { status, pairingCode, expiresAt, viewerId, connectionState, setStatus, applyEvent } =
     useAgentStore()
   const peerSessionRef = useRef<AgentPeerSessionManager<MediaStream, AgentPeerController>>()
+  const activeViewerIdRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
     let mounted = true
     const peerSession = new AgentPeerSessionManager({
       capture: capturePrimaryScreen,
-      createController: (stream: MediaStream) => createAgentPeerController(api, stream),
+      createController: (stream: MediaStream) => {
+        const activeViewerId = activeViewerIdRef.current
+        return createAgentPeerController(
+          api,
+          stream,
+          activeViewerId === undefined ? {} : { viewerId: activeViewerId },
+        )
+      },
       stopStream,
       reportPeerConnectionState: (state) => api.reportPeerConnectionState(state),
     })
@@ -33,6 +41,7 @@ export function App(): JSX.Element {
       applyEvent(event)
 
       if (event.type === 'session-state' && event.state.phase === 'connecting') {
+        activeViewerIdRef.current = event.state.viewerId
         void peerSession.start()
       }
       if (
@@ -40,6 +49,7 @@ export function App(): JSX.Element {
         (event.type === 'session-state' &&
           (event.state.phase === 'pairing' || event.state.phase === 'disconnecting'))
       ) {
+        activeViewerIdRef.current = undefined
         peerSession.stop()
       }
     })

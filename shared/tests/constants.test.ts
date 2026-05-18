@@ -8,6 +8,7 @@ import {
   PAIR_MAX_ATTEMPTS,
   PROTOCOL_VERSION,
   VIDEO_MAX_BITRATE_BPS,
+  VIDEO_RN_ANDROID_SCALE_DOWN_BY,
 } from '../src/constants.js'
 
 describe('constants', () => {
@@ -29,5 +30,9 @@ describe('constants', () => {
 
   it('defines the max video bitrate', () => {
     expect(VIDEO_MAX_BITRATE_BPS).toBe(8_000_000)
+  })
+
+  it('defines Android RN video scale down', () => {
+    expect(VIDEO_RN_ANDROID_SCALE_DOWN_BY).toBe(2)
   })
 })

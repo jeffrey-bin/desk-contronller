@@ -55,13 +55,25 @@ try {
     await run('pnpm', ['exec', 'react-native', 'run-ios', '--simulator', 'iPhone 16'])
   }
 
-  await run('maestro', ['test', '--platform', platform, flowFile], {
-    HOST: '127.0.0.1',
-    PORT: port,
-    PAIR_CODE: pairCode,
-    MAESTRO_CLI_NO_ANALYTICS: '1',
-    MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED: 'true',
-  })
+  await run(
+    'maestro',
+    [
+      'test',
+      '--platform',
+      platform,
+      '-e',
+      'HOST=127.0.0.1',
+      '-e',
+      `PORT=${port}`,
+      '-e',
+      `PAIR_CODE=${pairCode}`,
+      flowFile,
+    ],
+    {
+      MAESTRO_CLI_NO_ANALYTICS: '1',
+      MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED: 'true',
+    },
+  )
 } finally {
   for (const child of children.reverse()) {
     child.kill('SIGTERM')

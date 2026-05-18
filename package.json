@@ -19,6 +19,8 @@
     "e2e:m2:mobile": "pnpm --filter @desk/mobile-viewer test -- tests/mobile-mainlink-e2e.test.ts",
     "e2e:m2:native:ios": "pnpm --filter @desk/mobile-viewer e2e:native:ios",
     "e2e:m2:native:android": "pnpm --filter @desk/mobile-viewer e2e:native:android",
+    "e2e:m2:native:real:ios": "pnpm --filter @desk/mobile-viewer e2e:native:real:ios",
+    "e2e:m2:native:real:android": "pnpm --filter @desk/mobile-viewer e2e:native:real:android",
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint && prettier --check .",
     "format": "prettier --write .",

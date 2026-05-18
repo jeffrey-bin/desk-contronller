@@ -1,4 +1,4 @@
-import type { SignalingMessage } from '@desk/shared'
+import { PROTOCOL_VERSION, type SignalingMessage } from '@desk/shared'
 import {
   decodeMessage,
   encodeMessage,
@@ -10,7 +10,7 @@ import {
 
 type DecodeFailureReason = Extract<DecodeResult, { ok: false }>['reason']
 
-type RelayWebSocket = {
+export type MobileWebSocket = {
   readonly readyState: number
   send(data: string): void
   close(): void
@@ -27,36 +27,45 @@ type RelayWebSocket = {
   ): void
 }
 
-type RelayWebSocketConstructor = new (url: string) => RelayWebSocket
+export type MobileWebSocketConstructor = new (url: string) => MobileWebSocket
+
+export type MobileWebSocketLogger = {
+  warn(message: string): void
+}
+
+type WebSocketHandshake =
+  | Extract<SignalingMessage, { t: 'hello' }>
+  | Extract<SignalingMessage, { t: 'join-room' }>
+
+export type MobileWebSocketTransportOptions = {
+  url: string
+  handshake: WebSocketHandshake
+  webSocketCtor?: MobileWebSocketConstructor | undefined
+  logger?: MobileWebSocketLogger | undefined
+}
 
 export type MobileRelayTransportOptions = {
   url: string
   roomId: string
   role: 'agent' | 'viewer'
   clientId: string
-  webSocketCtor?: RelayWebSocketConstructor
-  logger?: {
-    warn(message: string): void
-  }
+  webSocketCtor?: MobileWebSocketConstructor | undefined
+  logger?: MobileWebSocketLogger | undefined
 }
 
-export class MobileRelayTransport implements SignalingTransport {
+export class MobileWebSocketTransport implements SignalingTransport {
   readonly #url: string
-  readonly #roomId: string
-  readonly #role: MobileRelayTransportOptions['role']
-  readonly #clientId: string
-  readonly #webSocketCtor: RelayWebSocketConstructor
-  readonly #logger: MobileRelayTransportOptions['logger']
-  #socket: RelayWebSocket | undefined
+  readonly #handshake: WebSocketHandshake
+  readonly #webSocketCtor: MobileWebSocketConstructor
+  readonly #logger: MobileWebSocketLogger | undefined
+  #socket: MobileWebSocket | undefined
   #startPromise: Promise<void> | undefined
   readonly #messageHandlers = new Set<(msg: SignalingMessage) => void>()
   readonly #stateHandlers = new Set<(state: ConnectionState) => void>()
 
-  constructor(opts: MobileRelayTransportOptions) {
+  constructor(opts: MobileWebSocketTransportOptions) {
     this.#url = opts.url
-    this.#roomId = opts.roomId
-    this.#role = opts.role
-    this.#clientId = opts.clientId
+    this.#handshake = opts.handshake
     this.#webSocketCtor = opts.webSocketCtor ?? WebSocket
     this.#logger = opts.logger
   }
@@ -112,22 +121,14 @@ export class MobileRelayTransport implements SignalingTransport {
             return
           }
 
-          socket.send(
-            encodeMessage({
-              v: 1,
-              t: 'join-room',
-              roomId: this.#roomId,
-              role: this.#role,
-              clientId: this.#clientId,
-            }),
-          )
+          socket.send(encodeMessage(this.#handshake))
           this.#startPromise = undefined
           this.#emitState('open')
           resolve()
         },
         { once: true },
       )
-      socket.addEventListener('error', () => reject(new Error('Relay WebSocket error')), {
+      socket.addEventListener('error', () => reject(new Error('WebSocket error')), {
         once: true,
       })
     })
@@ -183,5 +184,22 @@ export class MobileRelayTransport implements SignalingTransport {
 
   #warnInvalid(reason: DecodeFailureReason): void {
     this.#logger?.warn(`Discarded invalid signaling message: ${reason}`)
+  }
+}
+
+export class MobileRelayTransport extends MobileWebSocketTransport {
+  constructor(opts: MobileRelayTransportOptions) {
+    super({
+      url: opts.url,
+      handshake: {
+        v: PROTOCOL_VERSION,
+        t: 'join-room',
+        roomId: opts.roomId,
+        role: opts.role,
+        clientId: opts.clientId,
+      },
+      webSocketCtor: opts.webSocketCtor,
+      logger: opts.logger,
+    })
   }
 }

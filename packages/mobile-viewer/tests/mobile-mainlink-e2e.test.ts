@@ -62,7 +62,7 @@ describe('mobile Viewer M2 main link', () => {
     })
 
     await vi.waitFor(() => expect(session.state).toBe('streaming'))
-    expect(peer.acceptOffer).toHaveBeenCalledWith('agent-offer-sdp')
+    expect(peer.acceptOffer).toHaveBeenCalledWith('agent-offer-sdp', expect.any(Function))
     expect(peer.addIceCandidate).toHaveBeenCalledWith({
       candidate: 'candidate:1 1 udp 1 127.0.0.1 9 typ host',
     })

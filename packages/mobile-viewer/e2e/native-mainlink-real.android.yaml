@@ -18,8 +18,8 @@ appId: com.deskcontroller.mobileviewer
     id: pair-code-input
 - eraseText
 - inputText: ${PAIR_CODE}
-- hideKeyboard
 - tapOn:
     id: connect-button
 - assertVisible: streaming
-- assertVisible: rn-remote-stream
+- assertVisible:
+    id: remote-video

@@ -45,5 +45,7 @@ describe('MobileViewerSession', () => {
       expect(states).toEqual(['pairing', 'negotiating', 'negotiating', 'streaming']),
     )
     expect(session.stream).toEqual({ id: 'native-stream', videoTracks: 1 })
+    expect(peer.acceptOffer).toHaveBeenCalledWith('offer-sdp', expect.any(Function))
+    expect(transport.send).toHaveBeenCalledWith({ v: 1, t: 'answer', sdp: 'answer-sdp' })
   })
 })

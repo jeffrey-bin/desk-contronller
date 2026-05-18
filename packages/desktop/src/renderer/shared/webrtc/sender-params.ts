@@ -4,7 +4,14 @@ type TunableSendParameters = RTCRtpSendParameters & {
   degradationPreference?: 'maintain-resolution'
 }
 
-export async function tuneVideoSender(sender: RTCRtpSender): Promise<void> {
+export type VideoSenderTuneOptions = {
+  scaleResolutionDownBy?: number
+}
+
+export async function tuneVideoSender(
+  sender: RTCRtpSender,
+  options: VideoSenderTuneOptions = {},
+): Promise<void> {
   if (typeof sender.getParameters !== 'function' || typeof sender.setParameters !== 'function') {
     return
   }
@@ -18,6 +25,9 @@ export async function tuneVideoSender(sender: RTCRtpSender): Promise<void> {
   for (const encoding of parameters.encodings) {
     encoding.maxBitrate = VIDEO_MAX_BITRATE_BPS
     encoding.maxFramerate = VIDEO_MAX_FRAMERATE
+    if (options.scaleResolutionDownBy !== undefined) {
+      encoding.scaleResolutionDownBy = options.scaleResolutionDownBy
+    }
   }
 
   if ('degradationPreference' in parameters) {

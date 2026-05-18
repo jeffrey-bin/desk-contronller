@@ -22,4 +22,5 @@ appId: com.deskcontroller.mobileviewer
 - tapOn:
     id: connect-button
 - assertVisible: streaming
-- assertVisible: rn-remote-stream
+- assertVisible:
+    id: remote-video

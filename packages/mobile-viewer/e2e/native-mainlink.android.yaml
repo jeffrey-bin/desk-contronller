@@ -1,8 +1,4 @@
 appId: com.deskcontroller.mobileviewer
-env:
-  HOST: 127.0.0.1
-  PORT: '49831'
-  PAIR_CODE: RNM2E2
 ---
 - launchApp:
     clearState: true

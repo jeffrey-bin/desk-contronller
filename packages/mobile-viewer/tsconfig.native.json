@@ -1,0 +1,12 @@
+{
+  "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@desk/shared": ["../../shared/src/index.ts"],
+      "@desk/signaling": ["../signaling/src/index.ts"]
+    },
+    "types": ["react-native"]
+  },
+  "include": ["app/**/*.ts", "app/**/*.tsx"]
+}

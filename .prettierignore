@@ -1,0 +1,7 @@
+node_modules/
+dist/
+out/
+coverage/
+
+packages/mobile-viewer/android/
+packages/mobile-viewer/ios/

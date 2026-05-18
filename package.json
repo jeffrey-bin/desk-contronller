@@ -1,0 +1,51 @@
+{
+  "name": "desk-controller",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "start:agent": "pnpm dev:agent",
+    "start:viewer": "pnpm dev:viewer",
+    "dev:agent": "APP_MODE=agent pnpm --filter @desk/desktop dev",
+    "dev:viewer": "APP_MODE=viewer pnpm --filter @desk/desktop dev",
+    "e2e": "pnpm e2e:m1 && pnpm e2e:m1:real",
+    "e2e:m1": "pnpm --filter @desk/desktop test -- tests/m1-e2e.test.ts",
+    "e2e:m1:real": "pnpm --filter @desk/desktop build && playwright test -c packages/desktop/playwright.config.ts",
+    "e2e:m2:mobile": "pnpm --filter @desk/mobile-viewer test -- tests/mobile-mainlink-e2e.test.ts",
+    "e2e:m2:native:ios": "pnpm --filter @desk/mobile-viewer e2e:native:ios",
+    "e2e:m2:native:android": "pnpm --filter @desk/mobile-viewer e2e:native:android",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint && prettier --check .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@playwright/test": "^1.60.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.46.3",
+    "vitest": "^2.1.0"
+  }
+}

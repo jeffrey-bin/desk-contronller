@@ -1,6 +1,6 @@
 # desk-controller 项目规范
 
-> Claude Code 在本仓库工作时必读。任何与本文冲突的「惯例」「常见做法」一律以本文为准。规范要改，先改本文，再改实践，禁止反过来。
+> Codex 在本仓库工作时必读。任何与本文冲突的「惯例」「常见做法」一律以本文为准。规范要改，先改本文，再改实践，禁止反过来。
 
 ---
 
@@ -20,7 +20,7 @@
 packages/
 ├── desktop/          Electron 应用（Agent + Viewer 双模式，模式见设计文档 §5.0）
 ├── signaling/        信令协议 + Transport 抽象与实现（禁止依赖 Electron API）
-├── relay-server/     M2 预留，本阶段保留空骨架
+├── relay-server/     M2-a 公网信令中继（Node + ws，禁止依赖 Electron API）
 └── mobile-viewer/    M2 预留，本阶段保留空骨架
 shared/               跨包共享：类型、协议、常量、纯函数（零运行时依赖，禁止依赖任何其他包）
 docs/specs/           设计文档与变更记录，文件命名 YYYY-MM-DD-<topic>-design.md
@@ -86,12 +86,17 @@ docs/specs/           设计文档与变更记录，文件命名 YYYY-MM-DD-<top
 > 命令在仓库脚手架搭好后填入；脚手架未到位前，每次「完成」前至少手动跑一遍核心路径。
 
 ```bash
-pnpm typecheck     # 必过
-pnpm lint          # 必过
-pnpm test          # 必过；coords/pairing/state-machine 等核心模块覆盖率 ≥ 95%
+pnpm typecheck                                      # 必过
+pnpm lint                                           # 必过
+pnpm test                                           # 必过；coords/pairing/state-machine 等核心模块覆盖率 ≥ 95%
+pnpm e2e:m1                                        # 必过；Vitest fake-loopback 主链路 E2E
+pnpm e2e:m1:real                                   # UI/端到端改动必过；Playwright 真实 Agent/Viewer smoke
+pnpm e2e:m2:mobile                                 # M2/RN Viewer 改动必过；relay + RN-compatible 主链路 E2E
+pnpm e2e:m2:native:ios                             # RN 原生 iOS Viewer 改动必过；Xcode Simulator + Maestro smoke
+pnpm e2e:m2:native:android                         # RN 原生 Android Viewer 改动必过；BlueStacks/ADB + Maestro smoke
 ```
 
-UI/端到端改动需手动测试，参考设计文档 §14.2 清单（启动 Agent / Viewer、配对、收到画面、键鼠操作、断开等）。
+UI/端到端改动需同时通过自动 E2E 与人工测试清单，参考设计文档 §14.2（启动 Agent / Viewer、配对、收到画面、键鼠操作、断开等）。
 
 **不要为了让代码跑起来注释掉报错、加 `@ts-ignore`、`eslint-disable`，找根本原因**。连续两次修复失败，停下来重新分析问题。
 

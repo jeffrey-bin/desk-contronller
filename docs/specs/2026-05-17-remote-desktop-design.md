@@ -16,17 +16,17 @@
 
 ### 1.2 M1 范围（本设计文档覆盖）
 
-| 维度 | M1 范围 |
-|---|---|
-| 角色 | Desktop Viewer + Desktop Agent + 内嵌 Signaling |
-| 网络 | 局域网（LAN）|
-| 平台 | macOS + Windows（Agent 与 Viewer 同构）|
-| 视频 | 单显示器，主屏，H.264 优先，自适应码率 |
-| 控制 | 鼠标（移动 / 点击 / 滚轮）+ 键盘（含修饰键） |
-| 鉴权 | 6 位 Base32 配对码 + TTL + 重试锁定 |
-| UX | Agent 主窗口 + 悬浮状态条 + 一键断开；Viewer 列表 + 画布 + 实时统计 |
-| 发现 | mDNS 自动发现 + 手动 IP:Port 兜底 |
-| 观测 | 实时 WebRTC 统计 UI、`electron-log` 文件日志 |
+| 维度 | M1 范围                                                             |
+| ---- | ------------------------------------------------------------------- |
+| 角色 | Desktop Viewer + Desktop Agent + 内嵌 Signaling                     |
+| 网络 | 局域网（LAN）                                                       |
+| 平台 | macOS + Windows（Agent 与 Viewer 同构）                             |
+| 视频 | 单显示器，主屏，H.264 优先，自适应码率                              |
+| 控制 | 鼠标（移动 / 点击 / 滚轮）+ 键盘（含修饰键）                        |
+| 鉴权 | 6 位 Base32 配对码 + TTL + 重试锁定                                 |
+| UX   | Agent 主窗口 + 悬浮状态条 + 一键断开；Viewer 列表 + 画布 + 实时统计 |
+| 发现 | mDNS 自动发现 + 手动 IP:Port 兜底                                   |
+| 观测 | 实时 WebRTC 统计 UI、`electron-log` 文件日志                        |
 
 ### 1.3 非目标（显式不做）
 
@@ -49,12 +49,12 @@
 
 ### 1.4 演进路径
 
-| 里程碑 | 增量 |
-|---|---|
-| M1（本文档） | LAN + 桌面双端 + 核心通路 |
-| M2-a | 公网信令中继（rendezvous）+ TURN 集成 |
-| M2-b | React Native 移动端 Viewer（含触摸映射） |
-| M3+ | 多屏、剪贴板、文件传输等增值能力 |
+| 里程碑       | 增量                                     |
+| ------------ | ---------------------------------------- |
+| M1（本文档） | LAN + 桌面双端 + 核心通路                |
+| M2-a         | 公网信令中继（rendezvous）+ TURN 集成    |
+| M2-b         | React Native 移动端 Viewer（含触摸映射） |
+| M3+          | 多屏、剪贴板、文件传输等增值能力         |
 
 ---
 
@@ -94,45 +94,45 @@
 
 ### 2.3 关键技术决策一览
 
-| 决策 | 选择 | 理由 |
-|---|---|---|
-| 视频传输 | WebRTC P2P + DTLS-SRTP | 标准、低延迟、自带加密 |
-| 信令传输 | WebSocket（embedded） | Electron main 起 ws server 最简单；M2 切到公网 server 协议不变 |
-| 信令位置（M1） | Agent main process | Viewer 既有桌面又有 RN（M2），RN 起不了 server，因此固定 Agent 端 |
-| 控制通道 | 双 DataChannel | mousemove 走 unreliable（最新覆盖旧），其他走 reliable ordered |
-| 键鼠注入 | `@nut-tree-fork/nut-js` | 跨平台 native，PoC 已验证 macOS 可控其他 App |
-| 视频编码 | SDP munging 强制 H.264 优先 | 屏幕文字锐利；macOS/Windows 都有硬解 |
-| 视频参数 | maxBitrate 8 Mbps · degradationPreference=maintain-resolution · contentHint=detail | 屏幕共享场景标准调优 |
-| 设备发现 | mDNS（bonjour-service）+ 手动输入兜底 | mDNS 在受限网络易失效，必须有兜底 |
-| 鉴权 | 6 位 Base32 配对码 + 5min TTL + 3 次锁定 60s | 防暴力 + 防误连 |
-| 坐标系 | 归一化（[0,1]）相对于视频内容区域（非 DOM） | 与视口/缩放/letterbox 解耦 |
-| 状态管理（前端） | Zustand | 轻量、无 boilerplate |
-| 构建 | electron-vite + electron-builder | 现代 + HMR |
-| Monorepo | pnpm workspaces | 轻量、缓存好 |
+| 决策             | 选择                                                                               | 理由                                                              |
+| ---------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 视频传输         | WebRTC P2P + DTLS-SRTP                                                             | 标准、低延迟、自带加密                                            |
+| 信令传输         | WebSocket（embedded）                                                              | Electron main 起 ws server 最简单；M2 切到公网 server 协议不变    |
+| 信令位置（M1）   | Agent main process                                                                 | Viewer 既有桌面又有 RN（M2），RN 起不了 server，因此固定 Agent 端 |
+| 控制通道         | 双 DataChannel                                                                     | mousemove 走 unreliable（最新覆盖旧），其他走 reliable ordered    |
+| 键鼠注入         | `@nut-tree-fork/nut-js`                                                            | 跨平台 native，PoC 已验证 macOS 可控其他 App                      |
+| 视频编码         | SDP munging 强制 H.264 优先                                                        | 屏幕文字锐利；macOS/Windows 都有硬解                              |
+| 视频参数         | maxBitrate 8 Mbps · degradationPreference=maintain-resolution · contentHint=detail | 屏幕共享场景标准调优                                              |
+| 设备发现         | mDNS（bonjour-service）+ 手动输入兜底                                              | mDNS 在受限网络易失效，必须有兜底                                 |
+| 鉴权             | 6 位 Base32 配对码 + 5min TTL + 3 次锁定 60s                                       | 防暴力 + 防误连                                                   |
+| 坐标系           | 归一化（[0,1]）相对于视频内容区域（非 DOM）                                        | 与视口/缩放/letterbox 解耦                                        |
+| 状态管理（前端） | Zustand                                                                            | 轻量、无 boilerplate                                              |
+| 构建             | electron-vite + electron-builder                                                   | 现代 + HMR                                                        |
+| Monorepo         | pnpm workspaces                                                                    | 轻量、缓存好                                                      |
 
 ---
 
 ## 3. 技术栈
 
-| 类别 | 选择 | 备注 |
-|---|---|---|
-| 语言 | TypeScript 5.x（strict） | 全栈统一 |
-| 运行时 | Electron 30+ | Chromium 内置 H.264 |
-| 包管理 | pnpm 9+ | workspaces |
-| 构建（Electron） | electron-vite | main / preload / renderer 一站式 |
-| 打包（M1 后） | electron-builder | mac dmg + win nsis |
-| 前端框架 | React 18 + TypeScript | |
-| 状态管理 | Zustand | |
-| UI 组件 | Tailwind CSS + shadcn/ui | 默认主题足够 |
-| 信令传输 | `ws`（main） + 浏览器 WebSocket（renderer） | |
-| 设备发现 | `bonjour-service` | mDNS / DNS-SD |
-| 输入注入 | `@nut-tree-fork/nut-js` | native，需 electron-rebuild |
-| 协议校验 | `zod` | 信令与控制消息 schema |
-| 日志 | `electron-log` | main + renderer 统一 |
-| 持久化 | `electron-store` | 用户配置 |
-| 测试 | Vitest + @testing-library/react | |
-| Lint / Format | ESLint + Prettier + husky + lint-staged | |
-| CI | GitHub Actions（lint + typecheck + unit test） | 不做打包 CI |
+| 类别             | 选择                                           | 备注                             |
+| ---------------- | ---------------------------------------------- | -------------------------------- |
+| 语言             | TypeScript 5.x（strict）                       | 全栈统一                         |
+| 运行时           | Electron 30+                                   | Chromium 内置 H.264              |
+| 包管理           | pnpm 9+                                        | workspaces                       |
+| 构建（Electron） | electron-vite                                  | main / preload / renderer 一站式 |
+| 打包（M1 后）    | electron-builder                               | mac dmg + win nsis               |
+| 前端框架         | React 18 + TypeScript                          |                                  |
+| 状态管理         | Zustand                                        |                                  |
+| UI 组件          | Tailwind CSS + shadcn/ui                       | 默认主题足够                     |
+| 信令传输         | `ws`（main） + 浏览器 WebSocket（renderer）    |                                  |
+| 设备发现         | `bonjour-service`                              | mDNS / DNS-SD                    |
+| 输入注入         | `@nut-tree-fork/nut-js`                        | native，需 electron-rebuild      |
+| 协议校验         | `zod`                                          | 信令与控制消息 schema            |
+| 日志             | `electron-log`                                 | main + renderer 统一             |
+| 持久化           | `electron-store`                               | 用户配置                         |
+| 测试             | Vitest + @testing-library/react                |                                  |
+| Lint / Format    | ESLint + Prettier + husky + lint-staged        |                                  |
+| CI               | GitHub Actions（lint + typecheck + unit test） | 不做打包 CI                      |
 
 ---
 
@@ -145,6 +145,7 @@ remote-desktop/
 │   │   ├── src/
 │   │   │   ├── main/         # main process
 │   │   │   │   ├── agent/    # Agent 专属（信令 server、nut-js、mDNS 广播）
+│   │   │   │   ├── signaling/# desktop-owned ws transport 实现
 │   │   │   │   ├── viewer/   # Viewer 专属（信令 client、mDNS 浏览）
 │   │   │   │   ├── ipc/      # IPC 通道定义
 │   │   │   │   └── index.ts
@@ -159,17 +160,14 @@ remote-desktop/
 │   │   ├── package.json
 │   │   └── tsconfig.json
 │   │
-│   ├── signaling/            # 信令协议 + Transport 抽象与实现
+│   ├── signaling/            # 信令 envelope + Transport 抽象（无 Node-only API）
 │   │   ├── src/
-│   │   │   ├── protocol/     # 消息类型 + zod schema
-│   │   │   ├── transport/    # SignalingTransport 接口
-│   │   │   │   ├── embedded-server.ts  # M1：Agent 内嵌
-│   │   │   │   ├── embedded-client.ts  # M1：Viewer 连内嵌
-│   │   │   │   └── relay-client.ts     # M2：公网中继客户端（接口预留）
+│   │   │   ├── envelope.ts   # encode/decode SignalingMessage
+│   │   │   ├── transport/    # SignalingTransport 接口（仅类型）
 │   │   │   └── index.ts
 │   │   └── package.json
 │   │
-│   ├── relay-server/         # M2 预留，公网信令中继（暂为空骨架）
+│   ├── relay-server/         # M2-a 公网信令中继（Node + ws）
 │   └── mobile-viewer/        # M2 预留，React Native（暂为空骨架）
 │
 ├── shared/                   # 跨包共享（类型 / 常量 / 纯函数）
@@ -197,7 +195,7 @@ remote-desktop/
 **包依赖规则**：
 
 - `shared/` 零运行时依赖，不引用任何其他包
-- `signaling/` 仅依赖 `shared/`，**不引用 Electron API**（确保 M2 relay-server 能在 Node 环境下复用）
+- `signaling/` 仅依赖 `shared/`，**不引用 Electron / Node-only API**（确保 M2 relay-server 与未来移动端只复用协议与接口）
 - `desktop/` 依赖 `shared/` + `signaling/` + Electron 生态
 - 包之间通过 `workspace:*` 引用
 
@@ -216,15 +214,15 @@ main 进程根据当前模式只加载对应子模块（`main/agent/*` 或 `main
 
 ### 5.1 Electron 内部进程分工
 
-| 模块 | 进程 | 不可改变原因 |
-|---|---|---|
-| `desktopCapturer` + `MediaStream` | renderer | API 只在 renderer 暴露 |
-| `RTCPeerConnection` / `DataChannel` | renderer | 必须与 MediaStream 同进程 |
-| `ws` Server（Agent 信令） | main | renderer 不能监听端口 |
-| `ws` Client（Viewer 信令） | main | 与发现/IPC 协同；renderer 也能跑但收敛在 main 更清晰 |
-| `@nut-tree-fork/nut-js` | main | native module，无法在 sandbox renderer 加载 |
-| mDNS 广播/浏览 | main | UDP 多播 |
-| 配对码生命周期 | main | 状态权威源；renderer 仅显示 |
+| 模块                                | 进程     | 不可改变原因                                         |
+| ----------------------------------- | -------- | ---------------------------------------------------- |
+| `desktopCapturer` + `MediaStream`   | renderer | API 只在 renderer 暴露                               |
+| `RTCPeerConnection` / `DataChannel` | renderer | 必须与 MediaStream 同进程                            |
+| `ws` Server（Agent 信令）           | main     | renderer 不能监听端口                                |
+| `ws` Client（Viewer 信令）          | main     | 与发现/IPC 协同；renderer 也能跑但收敛在 main 更清晰 |
+| `@nut-tree-fork/nut-js`             | main     | native module，无法在 sandbox renderer 加载          |
+| mDNS 广播/浏览                      | main     | UDP 多播                                             |
+| 配对码生命周期                      | main     | 状态权威源；renderer 仅显示                          |
 
 ### 5.2 Electron 安全基线
 
@@ -248,10 +246,11 @@ export interface SignalingTransport {
   onConnectionState(handler: (state: 'open' | 'closed' | 'error') => void): () => void
 }
 
-// 实现:
-// - EmbeddedServerTransport：Agent 端，ws.Server，监听端口
-// - EmbeddedClientTransport：Viewer 端，ws Client，连 Agent IP:Port
-// - RelayClientTransport：M2 预留，Agent/Viewer 都作为 client 连公网 rendezvous
+// 实现由运行时包持有:
+// - desktop/main/signaling/EmbeddedServerTransport：Agent 端，ws.Server，监听端口
+// - desktop/main/signaling/EmbeddedClientTransport：Viewer 端，ws Client，连 Agent IP:Port
+// - desktop/main/signaling/RelayClientTransport：M2，Agent/Viewer 都作为 client 连公网 rendezvous
+// - relay-server/：公网 rendezvous server，复用 envelope + SignalingTransport 语义
 ```
 
 上层（连接管理、配对、PC 协商）只依赖接口，切换实现不需要改业务代码。
@@ -280,12 +279,12 @@ Agent.renderer.desktopCapturer.getUserMedia()
 
 视频参数（在 `RTCRtpSender.setParameters` 与 `MediaStreamTrack.contentHint` 上配置）：
 
-| 参数 | 值 |
-|---|---|
-| `encodings[0].maxBitrate` | `8_000_000` |
-| `encodings[0].maxFramerate` | `60` |
-| `degradationPreference` | `maintain-resolution` |
-| `contentHint`（on track） | `detail` |
+| 参数                        | 值                    |
+| --------------------------- | --------------------- |
+| `encodings[0].maxBitrate`   | `8_000_000`           |
+| `encodings[0].maxFramerate` | `60`                  |
+| `degradationPreference`     | `maintain-resolution` |
+| `contentHint`（on track）   | `detail`              |
 
 ### 6.2 控制流（Viewer → Agent）
 
@@ -392,16 +391,16 @@ type SignalingMessage =
 
 **方向约定**：
 
-| 消息 | Viewer → Agent | Agent → Viewer |
-|---|---|---|
-| `hello` | ✓ | ✓（连接建立时各自发） |
-| `pair-request` | ✓ | |
-| `pair-result` | | ✓ |
-| `offer` | | ✓ |
-| `answer` | ✓ | |
-| `ice` | ✓ | ✓ |
-| `bye` | ✓ | ✓ |
-| `ping`/`pong` | ✓ | ✓ |
+| 消息           | Viewer → Agent | Agent → Viewer        |
+| -------------- | -------------- | --------------------- |
+| `hello`        | ✓              | ✓（连接建立时各自发） |
+| `pair-request` | ✓              |                       |
+| `pair-result`  |                | ✓                     |
+| `offer`        |                | ✓                     |
+| `answer`       | ✓              |                       |
+| `ice`          | ✓              | ✓                     |
+| `bye`          | ✓              | ✓                     |
+| `ping`/`pong`  | ✓              | ✓                     |
 
 ### 7.2 控制协议（DataChannel）
 
@@ -411,20 +410,20 @@ type SignalingMessage =
 
 ```typescript
 type MouseMsg =
-  | { t: 'mm'; x: number; y: number }                          // move
-  | { t: 'md'; x: number; y: number; b: 0 | 1 | 2 }            // down (0=左, 1=中, 2=右)
-  | { t: 'mu'; x: number; y: number; b: 0 | 1 | 2 }            // up
-  | { t: 'mw'; x: number; y: number; dx: number; dy: number }  // wheel（单位：行）
+  | { v: 1; t: 'mm'; x: number; y: number } // move
+  | { v: 1; t: 'md'; x: number; y: number; b: 0 | 1 | 2 } // down (0=左, 1=中, 2=右)
+  | { v: 1; t: 'mu'; x: number; y: number; b: 0 | 1 | 2 } // up
+  | { v: 1; t: 'mw'; x: number; y: number; dx: number; dy: number } // wheel（单位：行）
 ```
 
 **keyboard channel**（`ordered=true, reliable`）
 
 ```typescript
 type KeyMsg =
-  | { t: 'kd'; code: string; mods: number }     // KeyboardEvent.code
-  | { t: 'ku'; code: string; mods: number }
-  | { t: 'sync'; mods: number; keys: string[] } // 1s 一次的兜底
-  | { t: 'rk' }                                  // release all
+  | { v: 1; t: 'kd'; code: string; mods: number } // KeyboardEvent.code
+  | { v: 1; t: 'ku'; code: string; mods: number }
+  | { v: 1; t: 'sync'; mods: number; keys: string[] } // 1s 一次的兜底
+  | { v: 1; t: 'rk' } // release all
 ```
 
 `mods` 位掩码：`Shift=1, Ctrl=2, Alt=4, Meta=8`。
@@ -502,15 +501,15 @@ type SessionState =
 
 **迁移触发**：
 
-| from | to | 触发 |
-|---|---|---|
-| `pairing` | `pairing` | code TTL 到期，重新生成 |
-| `pairing` | `connecting` | 收到正确 `pair-request` → 回 `pair-result(ok)` → 自身触发 createOffer |
-| `pairing` | `pairing` | 错误 `pair-request`：attempts++，到达上限锁 60s |
-| `connecting` | `active` | `pc.connectionState === 'connected'` |
-| `connecting` | `disconnecting` | ICE failed / timeout |
-| `active` | `disconnecting` | 收到 `bye` / 用户点断开 / keepalive 超时 |
-| `disconnecting` | `pairing` | 清理完成（释放按键 + 关 PC） |
+| from            | to              | 触发                                                                  |
+| --------------- | --------------- | --------------------------------------------------------------------- |
+| `pairing`       | `pairing`       | code TTL 到期，重新生成                                               |
+| `pairing`       | `connecting`    | 收到正确 `pair-request` → 回 `pair-result(ok)` → 自身触发 createOffer |
+| `pairing`       | `pairing`       | 错误 `pair-request`：attempts++，到达上限锁 60s                       |
+| `connecting`    | `active`        | `pc.connectionState === 'connected'`                                  |
+| `connecting`    | `disconnecting` | ICE failed / timeout                                                  |
+| `active`        | `disconnecting` | 收到 `bye` / 用户点断开 / keepalive 超时                              |
+| `disconnecting` | `pairing`       | 清理完成（释放按键 + 关 PC）                                          |
 
 ### 8.2 Viewer 连接状态机
 
@@ -534,13 +533,13 @@ type SessionState =
 
 监听 `pc.connectionState`：
 
-| PC 状态 | 处理 |
-|---|---|
-| `new` / `connecting` | 等待，UI 显示「连接中」 |
-| `connected` | 切到 active/streaming |
-| `disconnected` | 5s 内可能自动恢复，不主动关闭；UI 提示「连接不稳定」 |
-| `failed` | 触发清理路径 |
-| `closed` | 清理完成 |
+| PC 状态              | 处理                                                 |
+| -------------------- | ---------------------------------------------------- |
+| `new` / `connecting` | 等待，UI 显示「连接中」                              |
+| `connected`          | 切到 active/streaming                                |
+| `disconnected`       | 5s 内可能自动恢复，不主动关闭；UI 提示「连接不稳定」 |
+| `failed`             | 触发清理路径                                         |
+| `closed`             | 清理完成                                             |
 
 ---
 
@@ -553,21 +552,15 @@ type SessionState =
 **Viewer 端**（事件 → 归一化）：
 
 ```typescript
-function eventToNormalized(
-  e: MouseEvent,
-  videoEl: HTMLVideoElement,
-): { x: number; y: number } {
+function eventToNormalized(e: MouseEvent, videoEl: HTMLVideoElement): { x: number; y: number } {
   const { videoWidth, videoHeight } = videoEl
   if (!videoWidth || !videoHeight) return { x: 0, y: 0 }
 
   const rect = videoEl.getBoundingClientRect()
-  const { x, y, w, h } = computeContentRect(
-    rect.width, rect.height,
-    videoWidth, videoHeight,
-  )
+  const { x, y, w, h } = computeContentRect(rect.width, rect.height, videoWidth, videoHeight)
 
   const px = e.clientX - rect.left - x
-  const py = e.clientY - rect.top  - y
+  const py = e.clientY - rect.top - y
   return {
     x: clamp(px / w, 0, 1),
     y: clamp(py / h, 0, 1),
@@ -598,8 +591,10 @@ function normalizedToScreen(
 ```typescript
 // shared/src/coords.ts
 export function computeContentRect(
-  domW: number, domH: number,
-  videoW: number, videoH: number,
+  domW: number,
+  domH: number,
+  videoW: number,
+  videoH: number,
 ): { x: number; y: number; w: number; h: number } {
   const domRatio = domW / domH
   const vidRatio = videoW / videoH
@@ -631,7 +626,7 @@ offer.sdp = preferH264(offer.sdp)
 await pc.setLocalDescription(offer)
 
 // RTP sender 参数（在 ontrack 之后或 addTrack 之后）：
-const sender = pc.getSenders().find(s => s.track?.kind === 'video')
+const sender = pc.getSenders().find((s) => s.track?.kind === 'video')
 const params = sender.getParameters()
 params.encodings[0].maxBitrate = 8_000_000
 params.encodings[0].maxFramerate = 60
@@ -672,12 +667,12 @@ function createMouseMoveThrottler(send: (msg: MouseMsg) => void) {
 
 ```typescript
 // shared/src/pairing.ts
-const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'  // 去掉 I L O 0 1
+const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // 去掉 I L O 0 1
 const LENGTH = 6
 
 export function generatePairCode(): string {
   const bytes = crypto.randomBytes(LENGTH)
-  return Array.from(bytes, b => ALPHABET[b % ALPHABET.length]).join('')
+  return Array.from(bytes, (b) => ALPHABET[b % ALPHABET.length]).join('')
 }
 
 // constant-time 比较，防 timing attack
@@ -713,28 +708,28 @@ export function verifyPairCode(input: string, expected: string): boolean {
 
 ## 10. 边界条件与错误处理
 
-| 类别 | 场景 | 处理 |
-|---|---|---|
-| 网络 | ws 信令断 PC 还活着 | 不重建 PC；允许重连信令；UI 提示「信令断开但视频正常」 |
-| 网络 | ICE 收集 10s 超时 | 报错 `E_ICE_FAILED`，UI 提示，回到 pairing |
-| 网络 | keepalive 3s/10s | 超时视为断开 |
-| 网络 | 第二个 viewer 尝试连接 | 立即回 `E_PEER_BUSY` 并断开 ws |
-| 鉴权 | 错误 pair code | attempts++，达 3 拒绝 60s |
-| 鉴权 | code 过期 | 返回 `E_PAIR_EXPIRED`，UI 提示用户重新查看新码 |
-| 输入 | 归一化坐标越界 | Agent 端 `clamp(0, 1)`，不报错 |
-| 输入 | viewer 断开时按键残留 | 发 `rk` + Agent 兜底释放 |
-| 输入 | IME 输入 | Viewer 端丢弃 composition 事件，不发送 |
-| 输入 | 滚轮 delta 单位 | Viewer 按平台归一化为「行数」 |
-| 视频 | Agent 切换分辨率 | MediaStream 自动 restart；Viewer 端 video element 重渲染 |
-| 视频 | Agent 锁屏 / 屏保 | 视频可能冻结；Viewer 端 5s 无新帧提示 |
-| 视频 | 屏幕录制权限未授权 | Agent 启动检测，未授权不进 pairing，UI 引导授权 |
-| 视频 | 辅助功能权限未授权 | 同上，单独检测 |
-| 协议 | 未知消息 type | 丢弃 + warning，不 crash |
-| 协议 | 版本不匹配 | hello 阶段拒绝 |
-| 进程 | Agent 单实例锁 | `app.requestSingleInstanceLock`，第二实例退出并把第一实例窗口拉前 |
-| 进程 | 退出清理 | `before-quit`：广播 bye → 关 PC/DC → 关 ws server → 释放 capturer；2s 超时强退 |
-| UI | Viewer 失去焦点 | 发 `rk`，停止转发输入 |
-| UI | Viewer 全屏退出 | 按 ESC（系统默认），无需自定义 |
+| 类别 | 场景                   | 处理                                                                           |
+| ---- | ---------------------- | ------------------------------------------------------------------------------ |
+| 网络 | ws 信令断 PC 还活着    | 不重建 PC；允许重连信令；UI 提示「信令断开但视频正常」                         |
+| 网络 | ICE 收集 10s 超时      | 报错 `E_ICE_FAILED`，UI 提示，回到 pairing                                     |
+| 网络 | keepalive 3s/10s       | 超时视为断开                                                                   |
+| 网络 | 第二个 viewer 尝试连接 | 立即回 `E_PEER_BUSY` 并断开 ws                                                 |
+| 鉴权 | 错误 pair code         | attempts++，达 3 拒绝 60s                                                      |
+| 鉴权 | code 过期              | 返回 `E_PAIR_EXPIRED`，UI 提示用户重新查看新码                                 |
+| 输入 | 归一化坐标越界         | Agent 端 `clamp(0, 1)`，不报错                                                 |
+| 输入 | viewer 断开时按键残留  | 发 `rk` + Agent 兜底释放                                                       |
+| 输入 | IME 输入               | Viewer 端丢弃 composition 事件，不发送                                         |
+| 输入 | 滚轮 delta 单位        | Viewer 按平台归一化为「行数」                                                  |
+| 视频 | Agent 切换分辨率       | MediaStream 自动 restart；Viewer 端 video element 重渲染                       |
+| 视频 | Agent 锁屏 / 屏保      | 视频可能冻结；Viewer 端 5s 无新帧提示                                          |
+| 视频 | 屏幕录制权限未授权     | Agent 启动检测，未授权不进 pairing，UI 引导授权                                |
+| 视频 | 辅助功能权限未授权     | 同上，单独检测                                                                 |
+| 协议 | 未知消息 type          | 丢弃 + warning，不 crash                                                       |
+| 协议 | 版本不匹配             | hello 阶段拒绝                                                                 |
+| 进程 | Agent 单实例锁         | `app.requestSingleInstanceLock`，第二实例退出并把第一实例窗口拉前              |
+| 进程 | 退出清理               | `before-quit`：广播 bye → 关 PC/DC → 关 ws server → 释放 capturer；2s 超时强退 |
+| UI   | Viewer 失去焦点        | 发 `rk`，停止转发输入                                                          |
+| UI   | Viewer 全屏退出        | 按 ESC（系统默认），无需自定义                                                 |
 
 ---
 
@@ -751,12 +746,12 @@ export function verifyPairCode(input: string, expected: string): boolean {
 
 ### 11.2 已知风险（接受 / 待 M2 处理）
 
-| 风险 | 状态 |
-|---|---|
-| 信令明文 → SDP 可被嗅探 | 接受（DTLS 防中间人），M2 切 `wss://` |
+| 风险                     | 状态                                              |
+| ------------------------ | ------------------------------------------------- |
+| 信令明文 → SDP 可被嗅探  | 接受（DTLS 防中间人），M2 切 `wss://`             |
 | ws server 绑定 `0.0.0.0` | 接受，依赖配对码鉴权；M2 增加 origin / token 检查 |
-| Agent 无设备级身份验证 | M2 引入设备指纹与白名单 |
-| 没有审计日志 | electron-log 留有连接记录，未结构化 |
+| Agent 无设备级身份验证   | M2 引入设备指纹与白名单                           |
+| 没有审计日志             | electron-log 留有连接记录，未结构化               |
 
 ---
 
@@ -794,15 +789,15 @@ export function verifyPairCode(input: string, expected: string): boolean {
 
 ### 13.1 目标指标（LAN）
 
-| 指标 | 目标 |
-|---|---|
-| 端到端鼠标延迟 | < 80ms |
-| 视频分辨率 | 自适应 720p~1080p |
-| 帧率 | 30~60fps |
-| Agent CPU（Apple Silicon） | < 25% |
-| Viewer CPU | < 15% |
-| 视频码率 | ≤ 8 Mbps |
-| 连接建立时间 | < 3s（输入配对码后） |
+| 指标                       | 目标                 |
+| -------------------------- | -------------------- |
+| 端到端鼠标延迟             | < 80ms               |
+| 视频分辨率                 | 自适应 720p~1080p    |
+| 帧率                       | 30~60fps             |
+| Agent CPU（Apple Silicon） | < 25%                |
+| Viewer CPU                 | < 15%                |
+| 视频码率                   | ≤ 8 Mbps             |
+| 连接建立时间               | < 3s（输入配对码后） |
 
 ### 13.2 监控手段
 
@@ -815,34 +810,50 @@ export function verifyPairCode(input: string, expected: string): boolean {
 
 ### 14.1 单元测试覆盖（必须）
 
-| 包 | 模块 | 覆盖点 |
-|---|---|---|
-| shared | `coords.ts` | letterbox 计算（横/竖/相等/极端比例）、归一化、clamp |
-| shared | `pairing.ts` | 生成熵、constant-time 校验、字母表无歧义字符 |
-| shared | `protocol/*` | zod schema 解析成功 / 失败 / 未知字段处理 |
-| signaling | `transport/embedded-*.ts` | 启停、消息回环、断线回调 |
-| desktop/main | Agent 状态机 | 全部迁移路径，含错误码与锁定 |
-| desktop/main | mDNS 包装 | 广播、发现、超时 |
+| 包           | 模块                      | 覆盖点                                               |
+| ------------ | ------------------------- | ---------------------------------------------------- |
+| shared       | `coords.ts`               | letterbox 计算（横/竖/相等/极端比例）、归一化、clamp |
+| shared       | `pairing.ts`              | 生成熵、constant-time 校验、字母表无歧义字符         |
+| shared       | `protocol/*`              | zod schema 解析成功 / 失败 / 未知字段处理            |
+| signaling    | `transport/embedded-*.ts` | 启停、消息回环、断线回调                             |
+| desktop/main | Agent 状态机              | 全部迁移路径，含错误码与锁定                         |
+| desktop/main | mDNS 包装                 | 广播、发现、超时                                     |
 
 工具：Vitest。目标行覆盖率 80%+（核心模块 95%+）。
 
-### 14.2 手动测试清单（写入 README）
+### 14.2 E2E 与手动测试清单（写入 README）
 
 1. 启动 Agent（macOS / Windows 各一次）
 2. 启动 Viewer，确认 mDNS 发现
 3. 输入配对码，观察视频显现 < 3s
 4. 鼠标移动、点击、右键、滚轮
 5. 键盘输入英文、组合键（Cmd+C、Cmd+Tab）
-6. 故意输错 3 次配对码，确认锁定
+6. Viewer 端点击断开，Agent 端回到 pairing 状态
 7. Agent 端点击断开，Viewer 端 UI 正确回到列表
-8. Viewer 端关闭窗口，Agent 端回到 pairing 状态
-9. 拔网线模拟断网，UI 提示
+8. Viewer 端正常关闭窗口，Agent 端回到 pairing 状态
+9. 故意输错 3 次配对码，确认锁定与 code rotation
 10. 同时启动第二个 Viewer 尝试连接，应被拒绝
 11. 长按 Shift 后突然关闭 Viewer，确认 Agent 端无残留按键
+12. 拔网线模拟断网，UI 提示
+
+自动 E2E：
+
+- `pnpm e2e:m1`：运行 `packages/desktop/tests/m1-e2e.test.ts`
+- 覆盖：发现、配对、WebRTC offer/answer、视频流交付、鼠标移动 / 左键 / 右键 / 滚轮、键盘组合键、Viewer 断开、错码 3 次锁定 + code rotation、第二 Viewer 拒绝、Viewer transport 突断后的 modifier cleanup。
+- 边界：使用真实 loopback `ws` 信令；WebRTC、mDNS、屏幕采集、native input 使用 fake，以保证 CI 可跑。
+- `pnpm e2e:m1:real`：Playwright 启动真实 Agent / Viewer Electron 进程，校验 macOS 屏幕采集、配对、WebRTC 连接、Viewer 挂载 live remote video track。
+- 边界：依赖本机系统权限（macOS Screen Recording / Accessibility），适合作为本地发布前 smoke，不作为无权限 CI 的必跑项。
+
+仍需实机 smoke：
+
+- macOS / Windows 权限弹窗与系统限制
+- 可见指针移动与真实窗口输入
+- 真实 mDNS 局域网发现
+- 短暂网络中断后的恢复或干净失败
 
 ### 14.3 不在 MVP 范围
 
-- E2E 自动化（Electron + WebRTC，性价比低）
+- 完整 GUI 级 Electron 自动化（权限弹窗、真实屏幕采集、真实鼠标键盘注入）
 - 跨平台 CI 打包
 
 ---
@@ -866,7 +877,7 @@ export const ICE_GATHERING_TIMEOUT_MS = 10_000
 export const VIDEO_MAX_BITRATE_BPS = 8_000_000
 export const VIDEO_MAX_FRAMERATE = 60
 
-export const MOUSE_THROTTLE_HZ = 120
+export const MOUSE_THROTTLE_MIN_INTERVAL_MS = 8
 export const MOUSE_BUFFER_THRESHOLD_BYTES = 64 * 1024
 export const MODIFIER_SYNC_INTERVAL_MS = 1_000
 
@@ -883,20 +894,33 @@ export const QUIT_CLEANUP_TIMEOUT_MS = 2_000
 
 ## 16. 风险与未决问题
 
-| 风险 / 未决 | 影响 | 缓解 / 决策 |
-|---|---|---|
-| nut-js 在 Windows 控制 elevated app | 控不了 UAC 提升的窗口 | MVP 接受；文档明示 |
-| `desktopCapturer` 在 macOS Sonoma+ 弹「内容选择器」 | 每次启动可能要选 | 接受，写入已知限制 |
-| H.264 在某些 Linux Electron 构建未启用 | 不影响 macOS/Win | M1 不支持 Linux Agent |
-| 信令明文 ws | 同网段嗅探 | M2 切 wss |
-| Viewer 高分屏映射到 Agent 低分屏 | 文字模糊但可用 | 接受 |
-| 同时打开多 Viewer | 拒绝，仅 1:1 | 设计如此 |
+| 风险 / 未决                                         | 影响                  | 缓解 / 决策           |
+| --------------------------------------------------- | --------------------- | --------------------- |
+| nut-js 在 Windows 控制 elevated app                 | 控不了 UAC 提升的窗口 | MVP 接受；文档明示    |
+| `desktopCapturer` 在 macOS Sonoma+ 弹「内容选择器」 | 每次启动可能要选      | 接受，写入已知限制    |
+| H.264 在某些 Linux Electron 构建未启用              | 不影响 macOS/Win      | M1 不支持 Linux Agent |
+| 信令明文 ws                                         | 同网段嗅探            | M2 切 wss             |
+| Viewer 高分屏映射到 Agent 低分屏                    | 文字模糊但可用        | 接受                  |
+| 同时打开多 Viewer                                   | 拒绝，仅 1:1          | 设计如此              |
 
 ---
 
-## 17. M2 演进路径
+## 17. M2 开始准入
 
-### 17.1 公网中继（M2-a）
+进入 M2 前必须满足：
+
+- `pnpm typecheck` / `pnpm lint` / `pnpm test` 全绿
+- `pnpm e2e:m1` 与 `pnpm e2e:m1:real` 全绿
+- README 与本节测试清单一致
+- `shared/`、`signaling/` 包边界未破坏
+- `PROTOCOL_VERSION` 仍为 `1`
+- macOS / Windows 实机 smoke 已记录结果；权限、mDNS、native input 限制无新增未知项
+
+---
+
+## 18. M2 演进路径
+
+### 18.1 公网中继（M2-a）
 
 新增 `packages/relay-server/`：
 
@@ -904,7 +928,7 @@ export const QUIT_CLEANUP_TIMEOUT_MS = 2_000
 - Agent 启动连接 relay，注册 `roomId`（即配对码或扩展形式）
 - Viewer 连 relay，发送 `roomId` 与 pair-code
 - 协议层完全复用 §7.1（再增加 `join-room` 类型）
-- `SignalingTransport` 添加 `RelayClientTransport` 实现
+- `desktop/main/signaling` 添加 `RelayClientTransport` 实现，继续实现 `SignalingTransport`
 
 附加：
 
@@ -912,7 +936,7 @@ export const QUIT_CLEANUP_TIMEOUT_MS = 2_000
 - ICE servers 配置从 Agent UI 暴露
 - 信令切 `wss://`
 
-### 17.2 移动端 Viewer（M2-b）
+### 18.2 移动端 Viewer（M2-b）
 
 新增 `packages/mobile-viewer/`（React Native）：
 
@@ -920,23 +944,25 @@ export const QUIT_CLEANUP_TIMEOUT_MS = 2_000
 - `react-native-webrtc` 替代浏览器 WebRTC
 - 触摸映射层：单指点击 → 左键 / 长按 → 右键 / 双指拖动 → 滚轮 / 捏合 → 滚轮缩放
 - mDNS 在 RN 上能力受限，依赖手动 IP 输入或 QR 扫码
+- 自动 E2E：`pnpm e2e:m2:mobile` 启动真实 relay server，使用 RN-compatible Viewer session 与 fake native WebRTC adapter 验证配对、offer/answer、ICE、remote stream handoff。
+- 原生壳 E2E：Playwright 不覆盖 RN native；本机使用 Xcode Simulator、BlueStacks/ADB 与 Maestro 跑 `pnpm e2e:m2:native:ios` / `pnpm e2e:m2:native:android`，验证 RN Viewer 输入连接信息后进入 `streaming` 并拿到 remote stream handoff。
 
 ---
 
 ## 附录 A：术语表
 
-| 词 | 含义 |
-|---|---|
-| Agent | 被控端，运行 Electron + nut-js |
-| Viewer | 控制端，运行 Electron |
-| Signaling | 信令通道，承载 SDP/ICE/配对消息 |
-| PC | RTCPeerConnection |
-| DC | RTCDataChannel |
-| LAN | 局域网 |
-| TURN | Traversal Using Relays around NAT |
-| HUD | Heads-Up Display（悬浮指示条） |
-| TTL | Time To Live |
+| 词        | 含义                              |
+| --------- | --------------------------------- |
+| Agent     | 被控端，运行 Electron + nut-js    |
+| Viewer    | 控制端，运行 Electron             |
+| Signaling | 信令通道，承载 SDP/ICE/配对消息   |
+| PC        | RTCPeerConnection                 |
+| DC        | RTCDataChannel                    |
+| LAN       | 局域网                            |
+| TURN      | Traversal Using Relays around NAT |
+| HUD       | Heads-Up Display（悬浮指示条）    |
+| TTL       | Time To Live                      |
 
 ---
 
-*END OF DOCUMENT*
+_END OF DOCUMENT_

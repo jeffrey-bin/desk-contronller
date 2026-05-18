@@ -14,15 +14,15 @@
 
 ## Phase index
 
-| Phase | Tasks | Theme |
-|---|---|---|
-| 0 | T01–T07 | Workspace scaffolding & tooling |
-| 1 | T08–T15 | `shared/` package — strict TDD |
-| 2 | T16–T20 | `packages/signaling/` — transport abstraction |
-| 3 | T21–T28 | `packages/desktop/` scaffold (Electron + React shell) |
-| 4 | T29–T39 | Agent role (main + renderer + UI) |
-| 5 | T40–T49 | Viewer role (main + renderer + UI) |
-| 6 | T50–T52 | Integration smoke + README + baseline tag |
+| Phase | Tasks   | Theme                                                 |
+| ----- | ------- | ----------------------------------------------------- |
+| 0     | T01–T07 | Workspace scaffolding & tooling                       |
+| 1     | T08–T15 | `shared/` package — strict TDD                        |
+| 2     | T16–T20 | `packages/signaling/` — transport abstraction         |
+| 3     | T21–T28 | `packages/desktop/` scaffold (Electron + React shell) |
+| 4     | T29–T39 | Agent role (main + renderer + UI)                     |
+| 5     | T40–T49 | Viewer role (main + renderer + UI)                    |
+| 6     | T50–T52 | Integration smoke + README + baseline tag             |
 
 **Testing policy per layer**
 
@@ -51,6 +51,7 @@
 **Implements:** spec §4 (Monorepo Structure)
 
 **Files:**
+
 - Create: `package.json`
 - Create: `pnpm-workspace.yaml`
 - Create: `.npmrc`
@@ -115,6 +116,7 @@ git commit -m "chore: init pnpm workspace"
 ### T02: TypeScript base config
 
 **Files:**
+
 - Create: `tsconfig.base.json`
 
 - [ ] **Step 1: Write `tsconfig.base.json`**
@@ -157,6 +159,7 @@ git commit -m "chore: add strict TypeScript base config"
 ### T03: Prettier + ESLint
 
 **Files:**
+
 - Create: `.prettierrc.json`
 - Create: `.prettierignore`
 - Create: `eslint.config.js`
@@ -188,6 +191,7 @@ coverage
 - [ ] **Step 3: Install ESLint stack**
 
 Run:
+
 ```bash
 pnpm add -D -w eslint @eslint/js typescript-eslint eslint-plugin-react eslint-plugin-react-hooks
 ```
@@ -234,6 +238,7 @@ export default tseslint.config(
 - [ ] **Step 5: Add root lint script and verify**
 
 In root `package.json` `scripts`, replace `lint` with:
+
 ```json
 "lint": "eslint . && prettier --check ."
 ```
@@ -253,12 +258,14 @@ git commit -m "chore: configure prettier and eslint flat config"
 ### T04: husky + lint-staged
 
 **Files:**
+
 - Create: `.husky/pre-commit`
 - Modify: `package.json`
 
 - [ ] **Step 1: Install**
 
 Run:
+
 ```bash
 pnpm add -D -w husky lint-staged
 pnpm exec husky init
@@ -295,6 +302,7 @@ git commit -m "chore: add husky pre-commit with lint-staged"
 ### T05: Vitest at root
 
 **Files:**
+
 - Create: `vitest.workspace.ts`
 - Modify: `package.json`
 
@@ -307,11 +315,7 @@ Run: `pnpm add -D -w vitest @vitest/coverage-v8`
 ```ts
 import { defineWorkspace } from 'vitest/config'
 
-export default defineWorkspace([
-  'shared',
-  'packages/signaling',
-  'packages/desktop',
-])
+export default defineWorkspace(['shared', 'packages/signaling', 'packages/desktop'])
 ```
 
 - [ ] **Step 3: Update root `test` script**
@@ -339,6 +343,7 @@ git commit -m "chore: configure Vitest workspace"
 ### T06: GitHub Actions CI
 
 **Files:**
+
 - Create: `.github/workflows/ci.yml`
 
 - [ ] **Step 1: Write workflow**
@@ -378,6 +383,7 @@ git commit -m "ci: add typecheck/lint/test workflow"
 ### T07: README skeleton
 
 **Files:**
+
 - Create: `README.md`
 
 - [ ] **Step 1: Write README**
@@ -405,8 +411,8 @@ pnpm install
 ## Develop
 
 \`\`\`bash
-pnpm dev:agent    # run Electron as Agent (will be controlled)
-pnpm dev:viewer   # run Electron as Viewer (will control)
+pnpm dev:agent # run Electron as Agent (will be controlled)
+pnpm dev:viewer # run Electron as Viewer (will control)
 \`\`\`
 
 The two run in independent Electron instances with separate userData paths.
@@ -440,6 +446,7 @@ git commit -m "docs: add README skeleton"
 ### T08: Skeleton `shared/` package
 
 **Files:**
+
 - Create: `shared/package.json`
 - Create: `shared/tsconfig.json`
 - Create: `shared/vitest.config.ts`
@@ -532,6 +539,7 @@ git commit -m "feat(shared): scaffold package"
 **Implements:** spec §15
 
 **Files:**
+
 - Create: `shared/src/constants.ts`
 - Create: `shared/tests/constants.test.ts`
 - Modify: `shared/src/index.ts`
@@ -625,6 +633,7 @@ git commit -m "feat(shared): add protocol and runtime constants"
 **Implements:** spec §7.4
 
 **Files:**
+
 - Create: `shared/src/protocol/errors.ts`
 - Create: `shared/tests/errors.test.ts`
 - Modify: `shared/src/index.ts`
@@ -691,6 +700,7 @@ export function isErrorCode(x: unknown): x is ErrorCode {
 - [ ] **Step 4: Index export**
 
 Append to `shared/src/index.ts`:
+
 ```ts
 export * from './protocol/errors.js'
 ```
@@ -714,6 +724,7 @@ git commit -m "feat(shared): add ErrorCode enum and guard"
 **Implements:** spec §7.1, §7.5
 
 **Files:**
+
 - Create: `shared/src/protocol/signaling.ts`
 - Create: `shared/tests/signaling.test.ts`
 - Modify: `shared/src/index.ts`
@@ -745,7 +756,10 @@ describe('signaling protocol', () => {
 
   it('parses pair-result with error reason', () => {
     const parsed = parseSignalingMessage({
-      v: 1, t: 'pair-result', ok: false, reason: 'E_PAIR_INVALID_CODE',
+      v: 1,
+      t: 'pair-result',
+      ok: false,
+      reason: 'E_PAIR_INVALID_CODE',
     })
     expect(parsed.ok).toBe(true)
   })
@@ -793,13 +807,15 @@ const IceCandidateInit = z.object({
 
 export const SignalingMessageSchema = z.discriminatedUnion('t', [
   z.object({
-    v: Version, t: z.literal('hello'),
+    v: Version,
+    t: z.literal('hello'),
     role: z.enum(['agent', 'viewer']),
     clientId: z.string().min(1),
   }),
   z.object({ v: Version, t: z.literal('pair-request'), code: z.string().min(1) }),
   z.object({
-    v: Version, t: z.literal('pair-result'),
+    v: Version,
+    t: z.literal('pair-result'),
     ok: z.boolean(),
     reason: ErrorCodeSchema.optional(),
   }),
@@ -813,21 +829,18 @@ export const SignalingMessageSchema = z.discriminatedUnion('t', [
 
 export type SignalingMessage = z.infer<typeof SignalingMessageSchema>
 
-export type ParseResult<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: z.ZodError }
+export type ParseResult<T> = { ok: true; value: T } | { ok: false; error: z.ZodError }
 
 export function parseSignalingMessage(raw: unknown): ParseResult<SignalingMessage> {
   const parsed = SignalingMessageSchema.safeParse(raw)
-  return parsed.success
-    ? { ok: true, value: parsed.data }
-    : { ok: false, error: parsed.error }
+  return parsed.success ? { ok: true, value: parsed.data } : { ok: false, error: parsed.error }
 }
 ```
 
 - [ ] **Step 4: Index**
 
 Append to `shared/src/index.ts`:
+
 ```ts
 export * from './protocol/signaling.js'
 ```
@@ -851,6 +864,7 @@ git commit -m "feat(shared): add signaling message schemas"
 **Implements:** spec §7.2
 
 **Files:**
+
 - Create: `shared/src/protocol/control.ts`
 - Create: `shared/tests/control.test.ts`
 - Modify: `shared/src/index.ts`
@@ -861,8 +875,11 @@ git commit -m "feat(shared): add signaling message schemas"
 // shared/tests/control.test.ts
 import { describe, expect, it } from 'vitest'
 import {
-  parseMouseMsg, parseKeyMsg,
-  Mods, encodeMods, decodeMods,
+  parseMouseMsg,
+  parseKeyMsg,
+  Mods,
+  encodeMods,
+  decodeMods,
 } from '../src/protocol/control.js'
 
 describe('mouse messages', () => {
@@ -941,8 +958,11 @@ export const MouseMsgSchema = z.discriminatedUnion('t', [
   z.object({ t: z.literal('md'), x: z.number(), y: z.number(), b: Button }),
   z.object({ t: z.literal('mu'), x: z.number(), y: z.number(), b: Button }),
   z.object({
-    t: z.literal('mw'), x: z.number(), y: z.number(),
-    dx: z.number(), dy: z.number(),
+    t: z.literal('mw'),
+    x: z.number(),
+    y: z.number(),
+    dx: z.number(),
+    dy: z.number(),
   }),
 ])
 
@@ -976,6 +996,7 @@ export function parseKeyMsg(raw: unknown): ParseResult<KeyMsg> {
 - [ ] **Step 4: Index**
 
 Append to `shared/src/index.ts`:
+
 ```ts
 export * from './protocol/control.js'
 ```
@@ -995,6 +1016,7 @@ git commit -m "feat(shared): add mouse/keyboard control schemas"
 **Implements:** spec §9.1, §9.2
 
 **Files:**
+
 - Create: `shared/src/coords.ts`
 - Create: `shared/tests/coords.test.ts`
 - Modify: `shared/src/index.ts`
@@ -1034,12 +1056,17 @@ describe('computeContentRect', () => {
 
 describe('normalizedToScreen', () => {
   it('rounds to nearest integer', () => {
-    expect(normalizedToScreen({ x: 0.5, y: 0.5 }, { width: 1920, height: 1080 }))
-      .toEqual({ x: 960, y: 540 })
+    expect(normalizedToScreen({ x: 0.5, y: 0.5 }, { width: 1920, height: 1080 })).toEqual({
+      x: 960,
+      y: 540,
+    })
   })
   it('handles edges', () => {
     expect(normalizedToScreen({ x: 0, y: 0 }, { width: 100, height: 100 })).toEqual({ x: 0, y: 0 })
-    expect(normalizedToScreen({ x: 1, y: 1 }, { width: 100, height: 100 })).toEqual({ x: 100, y: 100 })
+    expect(normalizedToScreen({ x: 1, y: 1 }, { width: 100, height: 100 })).toEqual({
+      x: 100,
+      y: 100,
+    })
   })
 })
 
@@ -1064,11 +1091,18 @@ export type Point = { x: number; y: number }
 export type Size = { width: number; height: number }
 
 export function computeContentRect(
-  domW: number, domH: number,
-  videoW: number, videoH: number,
+  domW: number,
+  domH: number,
+  videoW: number,
+  videoH: number,
 ): Rect {
   if (videoW <= 0 || videoH <= 0 || domW <= 0 || domH <= 0) {
-    return { x: 0, y: 0, w: domW > 0 && videoW > 0 ? domW : 0, h: videoH > 0 && domH > 0 ? domH : 0 }
+    return {
+      x: 0,
+      y: 0,
+      w: domW > 0 && videoW > 0 ? domW : 0,
+      h: videoH > 0 && domH > 0 ? domH : 0,
+    }
   }
   const domRatio = domW / domH
   const vidRatio = videoW / videoH
@@ -1096,6 +1130,7 @@ export function normalizedToScreen(p: Point, size: Size): Point {
 - [ ] **Step 4: Index + verify + commit**
 
 Append to `shared/src/index.ts`:
+
 ```ts
 export * from './coords.js'
 ```
@@ -1113,6 +1148,7 @@ git commit -m "feat(shared): add coord/letterbox utilities"
 **Implements:** spec §9.5, §10 (pairing rows)
 
 **Files:**
+
 - Create: `shared/src/pairing.ts`
 - Create: `shared/tests/pairing.test.ts`
 - Modify: `shared/src/index.ts`
@@ -1122,10 +1158,14 @@ git commit -m "feat(shared): add coord/letterbox utilities"
 ```ts
 // shared/tests/pairing.test.ts
 import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { generatePairCode, verifyPairCode, PairStore } from '../src/pairing.js'
 import {
-  generatePairCode, verifyPairCode, PairStore,
-} from '../src/pairing.js'
-import { PAIR_CODE_ALPHABET, PAIR_CODE_LENGTH, PAIR_LOCKOUT_MS, PAIR_MAX_ATTEMPTS, PAIR_CODE_TTL_MS } from '../src/constants.js'
+  PAIR_CODE_ALPHABET,
+  PAIR_CODE_LENGTH,
+  PAIR_LOCKOUT_MS,
+  PAIR_MAX_ATTEMPTS,
+  PAIR_CODE_TTL_MS,
+} from '../src/constants.js'
 
 describe('generatePairCode', () => {
   it('produces correct length and only legal chars', () => {
@@ -1162,7 +1202,10 @@ describe('verifyPairCode', () => {
 })
 
 describe('PairStore', () => {
-  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-01-01T00:00:00Z')) })
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'))
+  })
 
   it('issues a code on creation with TTL set', () => {
     const s = new PairStore()
@@ -1239,8 +1282,11 @@ describe('PairStore', () => {
 // shared/src/pairing.ts
 import { webcrypto } from 'node:crypto'
 import {
-  PAIR_CODE_ALPHABET, PAIR_CODE_LENGTH, PAIR_CODE_TTL_MS,
-  PAIR_LOCKOUT_MS, PAIR_MAX_ATTEMPTS,
+  PAIR_CODE_ALPHABET,
+  PAIR_CODE_LENGTH,
+  PAIR_CODE_TTL_MS,
+  PAIR_LOCKOUT_MS,
+  PAIR_MAX_ATTEMPTS,
 } from './constants.js'
 import { ErrorCode } from './protocol/errors.js'
 
@@ -1270,9 +1316,7 @@ export type PairSnapshot = {
   lockedUntil?: number
 }
 
-export type VerifyResult =
-  | { ok: true }
-  | { ok: false; reason: ErrorCode }
+export type VerifyResult = { ok: true } | { ok: false; reason: ErrorCode }
 
 export class PairStore {
   private code: string
@@ -1320,7 +1364,9 @@ export class PairStore {
   }
 
   /** External signal: a session became active; freeze rotation until released. */
-  freeze(): void { /* current implementation auto-handles via session-state callers */ }
+  freeze(): void {
+    /* current implementation auto-handles via session-state callers */
+  }
 
   private refreshIfExpired(): void {
     const now = Date.now()
@@ -1336,6 +1382,7 @@ export class PairStore {
 - [ ] **Step 4: Index + verify + commit**
 
 Append to `shared/src/index.ts`:
+
 ```ts
 export * from './pairing.js'
 ```
@@ -1351,6 +1398,7 @@ git commit -m "feat(shared): add pair code generation/verification + PairStore"
 ### T15: Final `shared/` index audit + coverage check
 
 **Files:**
+
 - Modify: `shared/src/index.ts` (verify nothing is missed)
 
 - [ ] **Step 1: Inspect `shared/src/index.ts` — must re-export all of:**
@@ -1386,6 +1434,7 @@ git commit -m "chore(shared): finalize barrel exports" || true
 **Implements:** spec §5.3, §7.5
 
 **Files:**
+
 - Create: `packages/signaling/package.json`
 - Create: `packages/signaling/tsconfig.json`
 - Create: `packages/signaling/vitest.config.ts`
@@ -1493,7 +1542,11 @@ export function encodeMessage(msg: SignalingMessage): string {
 
 export function decodeMessage(raw: string): DecodeResult {
   let parsed: unknown
-  try { parsed = JSON.parse(raw) } catch { return { ok: false, reason: 'invalid-json' } }
+  try {
+    parsed = JSON.parse(raw)
+  } catch {
+    return { ok: false, reason: 'invalid-json' }
+  }
   const r = parseSignalingMessage(parsed)
   return r.ok ? { ok: true, value: r.value } : { ok: false, reason: 'invalid-schema' }
 }
@@ -1516,6 +1569,7 @@ pnpm --filter @desk/signaling typecheck   # may fail until T17 because of transp
 ```
 
 If it complains about `./transport/index.js`, temporarily comment that line, run test, then commit:
+
 ```bash
 pnpm --filter @desk/signaling test
 git add packages/signaling/ pnpm-lock.yaml
@@ -1529,6 +1583,7 @@ git commit -m "feat(signaling): scaffold package and envelope codec"
 **Implements:** spec §5.3
 
 **Files:**
+
 - Create: `packages/signaling/src/transport/index.ts`
 
 - [ ] **Step 1: Write interface**
@@ -1565,6 +1620,7 @@ git commit -m "feat(signaling): define SignalingTransport interface"
 ### T18: `EmbeddedServerTransport`
 
 **Files:**
+
 - Create: `packages/signaling/src/transport/embedded-server.ts`
 - Create: `packages/signaling/tests/embedded-server.test.ts`
 
@@ -1667,7 +1723,10 @@ export class EmbeddedServerTransport implements SignalingTransport {
   async start(): Promise<void> {
     await new Promise<void>((resolve, reject) => {
       const wss = new WebSocketServer({ host: this.opts.host, port: this.opts.port })
-      wss.once('listening', () => { this.server = wss; resolve() })
+      wss.once('listening', () => {
+        this.server = wss
+        resolve()
+      })
       wss.once('error', reject)
       wss.on('connection', (ws) => this.handleConnection(ws))
     })
@@ -1676,7 +1735,9 @@ export class EmbeddedServerTransport implements SignalingTransport {
   async stop(): Promise<void> {
     this.client?.close()
     this.client = undefined
-    await new Promise<void>((resolve) => this.server ? this.server.close(() => resolve()) : resolve())
+    await new Promise<void>((resolve) =>
+      this.server ? this.server.close(() => resolve()) : resolve(),
+    )
     this.server = undefined
     this.emitState('closed')
   }
@@ -1709,7 +1770,10 @@ export class EmbeddedServerTransport implements SignalingTransport {
       const r = decodeMessage(data.toString())
       if (r.ok) for (const h of this.msgHandlers) h(r.value)
     })
-    ws.on('close', () => { this.client = undefined; this.emitState('closed') })
+    ws.on('close', () => {
+      this.client = undefined
+      this.emitState('closed')
+    })
     ws.on('error', () => this.emitState('error'))
   }
 
@@ -1732,6 +1796,7 @@ git commit -m "feat(signaling): embedded ws server transport"
 ### T19: `EmbeddedClientTransport`
 
 **Files:**
+
 - Create: `packages/signaling/src/transport/embedded-client.ts`
 - Create: `packages/signaling/tests/embedded-client.test.ts`
 
@@ -1805,13 +1870,23 @@ export class EmbeddedClientTransport implements SignalingTransport {
   start(): Promise<void> {
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(`ws://${this.opts.host}:${this.opts.port}`)
-      ws.once('open', () => { this.ws = ws; this.emit('open'); resolve() })
-      ws.once('error', (err) => { this.emit('error'); reject(err) })
+      ws.once('open', () => {
+        this.ws = ws
+        this.emit('open')
+        resolve()
+      })
+      ws.once('error', (err) => {
+        this.emit('error')
+        reject(err)
+      })
       ws.on('message', (data) => {
         const r = decodeMessage(data.toString())
         if (r.ok) for (const h of this.msgHandlers) h(r.value)
       })
-      ws.on('close', () => { this.ws = undefined; this.emit('closed') })
+      ws.on('close', () => {
+        this.ws = undefined
+        this.emit('closed')
+      })
     })
   }
 
@@ -1851,6 +1926,7 @@ export class EmbeddedClientTransport implements SignalingTransport {
 - [ ] **Step 4: Re-export both transports**
 
 Append to `packages/signaling/src/transport/index.ts`:
+
 ```ts
 export { EmbeddedServerTransport } from './embedded-server.js'
 export type { ServerOpts } from './embedded-server.js'
@@ -1871,6 +1947,7 @@ git commit -m "feat(signaling): embedded ws client transport"
 ### T20: `RelayClientTransport` stub for M2
 
 **Files:**
+
 - Create: `packages/signaling/src/transport/relay-client.ts`
 
 - [ ] **Step 1: Stub**
@@ -1888,16 +1965,29 @@ export type RelayOpts = { url: string; roomId: string }
  */
 export class RelayClientTransport implements SignalingTransport {
   // suppress unused-variable lint at the type level
-  constructor(_opts: RelayOpts) { void _opts }
-  start(): Promise<void> { throw new Error('RelayClientTransport: not implemented in M1') }
-  stop(): Promise<void> { return Promise.resolve() }
-  send(_msg: SignalingMessage): void { void _msg }
-  onMessage(_h: (m: SignalingMessage) => void): Unsubscribe { return () => void 0 }
-  onConnectionState(_h: (s: ConnectionState) => void): Unsubscribe { return () => void 0 }
+  constructor(_opts: RelayOpts) {
+    void _opts
+  }
+  start(): Promise<void> {
+    throw new Error('RelayClientTransport: not implemented in M1')
+  }
+  stop(): Promise<void> {
+    return Promise.resolve()
+  }
+  send(_msg: SignalingMessage): void {
+    void _msg
+  }
+  onMessage(_h: (m: SignalingMessage) => void): Unsubscribe {
+    return () => void 0
+  }
+  onConnectionState(_h: (s: ConnectionState) => void): Unsubscribe {
+    return () => void 0
+  }
 }
 ```
 
 Append to `packages/signaling/src/transport/index.ts`:
+
 ```ts
 export { RelayClientTransport } from './relay-client.js'
 export type { RelayOpts } from './relay-client.js'
@@ -1982,7 +2072,13 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: { index: resolve(__dirname, 'src/main/index.ts') },
-        external: ['@nut-tree-fork/nut-js', 'bonjour-service', 'ws', 'electron-store', 'electron-log'],
+        external: [
+          '@nut-tree-fork/nut-js',
+          'bonjour-service',
+          'ws',
+          'electron-store',
+          'electron-log',
+        ],
       },
     },
   },
@@ -2020,6 +2116,7 @@ export default defineConfig({
 - [ ] **Step 3: Create three tsconfig files**
 
 `packages/desktop/tsconfig.json` (renderer):
+
 ```json
 {
   "extends": "../../tsconfig.base.json",
@@ -2033,6 +2130,7 @@ export default defineConfig({
 ```
 
 `packages/desktop/tsconfig.node.json` (main + tests):
+
 ```json
 {
   "extends": "../../tsconfig.base.json",
@@ -2048,6 +2146,7 @@ export default defineConfig({
 - [ ] **Step 4: Tailwind + Postcss**
 
 `packages/desktop/tailwind.config.ts`:
+
 ```ts
 import type { Config } from 'tailwindcss'
 export default {
@@ -2058,6 +2157,7 @@ export default {
 ```
 
 `packages/desktop/postcss.config.cjs`:
+
 ```js
 module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } }
 ```
@@ -2065,25 +2165,43 @@ module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } }
 - [ ] **Step 5: Renderer entry HTML files**
 
 `packages/desktop/src/renderer/welcome.html`:
+
 ```html
 <!doctype html>
-<html><head><meta charset="utf-8" /><title>desk-controller</title></head>
-<body><div id="root"></div><script type="module" src="/welcome/main.tsx"></script></body></html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>desk-controller</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/welcome/main.tsx"></script>
+  </body>
+</html>
 ```
 
 Repeat for `agent.html` (script `/agent/main.tsx`) and `viewer.html` (script `/viewer/main.tsx`).
 
 `packages/desktop/src/renderer/styles.css`:
+
 ```css
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-html, body, #root { height: 100%; margin: 0; background: #0a0a0a; color: #f5f5f5; }
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: #0a0a0a;
+  color: #f5f5f5;
+}
 ```
 
 Create placeholder `main.tsx` files (will be filled by later tasks):
 
 `packages/desktop/src/renderer/welcome/main.tsx`:
+
 ```tsx
 import { createRoot } from 'react-dom/client'
 import '../styles.css'
@@ -2098,6 +2216,7 @@ Repeat shape for `agent/main.tsx` and `viewer/main.tsx` (placeholders).
 - [ ] **Step 6: Main entry placeholder**
 
 `packages/desktop/src/main/index.ts`:
+
 ```ts
 import { app } from 'electron'
 
@@ -2109,12 +2228,14 @@ app.whenReady().then(() => {
 - [ ] **Step 7: Preload placeholders**
 
 `packages/desktop/src/preload/agent.ts`:
+
 ```ts
 import { contextBridge } from 'electron'
 contextBridge.exposeInMainWorld('api', { mode: 'agent' as const })
 ```
 
 `packages/desktop/src/preload/viewer.ts`:
+
 ```ts
 import { contextBridge } from 'electron'
 contextBridge.exposeInMainWorld('api', { mode: 'viewer' as const })
@@ -2143,6 +2264,7 @@ git commit -m "feat(desktop): scaffold Electron + Vite + React + Tailwind"
 **Implements:** spec §5.0
 
 **Files:**
+
 - Create: `packages/desktop/src/main/mode.ts`
 - Create: `packages/desktop/tests/mode.test.ts`
 
@@ -2154,7 +2276,9 @@ import { describe, expect, it, beforeEach } from 'vitest'
 import { resolveMode } from '../src/main/mode.js'
 
 describe('resolveMode', () => {
-  beforeEach(() => { delete process.env.APP_MODE })
+  beforeEach(() => {
+    delete process.env.APP_MODE
+  })
 
   it('honors APP_MODE=agent', () => {
     process.env.APP_MODE = 'agent'
@@ -2180,6 +2304,7 @@ describe('resolveMode', () => {
 - [ ] **Step 2: Add vitest config for desktop**
 
 `packages/desktop/vitest.config.ts`:
+
 ```ts
 import { defineConfig } from 'vitest/config'
 export default defineConfig({
@@ -2218,6 +2343,7 @@ git commit -m "feat(desktop/main): mode resolution from env + store"
 **Implements:** spec §10 (single-instance, exit cleanup), §5.0 (mode branching)
 
 **Files:**
+
 - Create: `packages/desktop/src/main/windows.ts`
 - Create: `packages/desktop/src/main/single-instance.ts`
 - Modify: `packages/desktop/src/main/index.ts`
@@ -2266,9 +2392,11 @@ const RENDERER_DIR = join(__dirname, '..', 'renderer')
 
 export function makeWindow(opts: MakeOpts): BrowserWindow {
   const preload =
-    opts.mode === 'agent' ? join(PRELOAD_DIR, 'agent.js')
-    : opts.mode === 'viewer' ? join(PRELOAD_DIR, 'viewer.js')
-    : join(PRELOAD_DIR, 'viewer.js') // welcome uses any minimal preload
+    opts.mode === 'agent'
+      ? join(PRELOAD_DIR, 'agent.js')
+      : opts.mode === 'viewer'
+        ? join(PRELOAD_DIR, 'viewer.js')
+        : join(PRELOAD_DIR, 'viewer.js') // welcome uses any minimal preload
 
   const win = new BrowserWindow({
     width: opts.width ?? 980,
@@ -2284,9 +2412,7 @@ export function makeWindow(opts: MakeOpts): BrowserWindow {
   })
 
   const htmlFile =
-    opts.mode === 'agent' ? 'agent.html'
-    : opts.mode === 'viewer' ? 'viewer.html'
-    : 'welcome.html'
+    opts.mode === 'agent' ? 'agent.html' : opts.mode === 'viewer' ? 'viewer.html' : 'welcome.html'
 
   if (process.env.ELECTRON_RENDERER_URL) {
     void win.loadURL(`${process.env.ELECTRON_RENDERER_URL}/${htmlFile}`)
@@ -2312,7 +2438,9 @@ import { QUIT_CLEANUP_TIMEOUT_MS } from '@desk/shared'
 log.initialize()
 
 type StoreShape = { mode?: 'agent' | 'viewer' }
-const store = new Store<StoreShape>({ name: process.env.APP_MODE ? `dev-${process.env.APP_MODE}` : 'config' })
+const store = new Store<StoreShape>({
+  name: process.env.APP_MODE ? `dev-${process.env.APP_MODE}` : 'config',
+})
 
 // In dev, set a per-mode userData dir so two electron instances can coexist.
 if (process.env.APP_MODE && !app.isPackaged) {
@@ -2323,14 +2451,24 @@ let mainWindow: BrowserWindow | null = null
 
 const ok = enforceSingleInstance(() => focusWindow(mainWindow))
 if (ok) {
-  app.whenReady().then(() => {
-    const mode = resolveMode({ stored: store.get('mode') })
-    log.info('desktop: starting in mode', mode)
-    mainWindow = makeWindow({ mode })
-    mainWindow.on('closed', () => { mainWindow = null })
-  }).catch((err) => { log.error('startup failed', err); app.quit() })
+  app
+    .whenReady()
+    .then(() => {
+      const mode = resolveMode({ stored: store.get('mode') })
+      log.info('desktop: starting in mode', mode)
+      mainWindow = makeWindow({ mode })
+      mainWindow.on('closed', () => {
+        mainWindow = null
+      })
+    })
+    .catch((err) => {
+      log.error('startup failed', err)
+      app.quit()
+    })
 
-  app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit() })
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit()
+  })
 
   app.on('before-quit', async (e) => {
     e.preventDefault()
@@ -2354,6 +2492,7 @@ async function cleanup(): Promise<void> {
 ```
 
 Install `cross-env` at root:
+
 ```bash
 pnpm add -D -w cross-env
 ```
@@ -2376,6 +2515,7 @@ git commit -m "feat(desktop): boot with mode branching, single-instance, clean s
 **Implements:** spec §5.2
 
 **Files:**
+
 - Modify: `packages/desktop/src/preload/agent.ts`
 - Modify: `packages/desktop/src/preload/viewer.ts`
 - Create: `packages/desktop/src/shared/api-types.ts`
@@ -2389,7 +2529,7 @@ import type { MouseMsg, KeyMsg, SignalingMessage } from '@desk/shared'
 
 export type AgentEvent =
   | { type: 'signaling:in'; payload: SignalingMessage }
-  | { type: 'session:state'; payload: unknown }   // refined in T30
+  | { type: 'session:state'; payload: unknown } // refined in T30
 
 export type ViewerEvent =
   | { type: 'signaling:in'; payload: SignalingMessage }
@@ -2497,6 +2637,7 @@ git commit -m "feat(desktop): typed contextBridge api for agent/viewer"
 **Implements:** spec §7.3
 
 **Files:**
+
 - Create: `packages/desktop/src/main/ipc/channels.ts`
 - Create: `packages/desktop/src/main/ipc/registry.ts`
 
@@ -2526,11 +2667,17 @@ import type { AgentEvent, ViewerEvent } from '../../shared/api-types.js'
 type CleanupFn = () => Promise<void> | void
 const cleanups: CleanupFn[] = []
 
-export function registerCleanup(fn: CleanupFn): void { cleanups.push(fn) }
+export function registerCleanup(fn: CleanupFn): void {
+  cleanups.push(fn)
+}
 
 export async function runCleanups(): Promise<void> {
   for (const fn of cleanups.splice(0).reverse()) {
-    try { await fn() } catch (e) { console.error('cleanup failed', e) }
+    try {
+      await fn()
+    } catch (e) {
+      console.error('cleanup failed', e)
+    }
   }
 }
 
@@ -2544,7 +2691,10 @@ export function pushViewerEvent(win: BrowserWindow | null, e: ViewerEvent): void
 export function onSend(channel: string, fn: (e: IpcMainEvent, ...args: unknown[]) => void): void {
   ipcMain.on(channel, fn)
 }
-export function onInvoke(channel: string, fn: (e: IpcMainInvokeEvent, ...args: unknown[]) => unknown): void {
+export function onInvoke(
+  channel: string,
+  fn: (e: IpcMainInvokeEvent, ...args: unknown[]) => unknown,
+): void {
   ipcMain.handle(channel, fn)
 }
 ```
@@ -2574,6 +2724,7 @@ git commit -m "feat(desktop/main): ipc channels and cleanup registry"
 ### T26: Zustand store wiring + Tailwind verified
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/shared/log.ts` (renderer log shim)
 - Modify: `packages/desktop/src/renderer/welcome/main.tsx` — render real Tailwind
 
@@ -2619,6 +2770,7 @@ git commit -m "feat(desktop/renderer): tailwind base + log shim"
 ### T27: Welcome mode picker
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/welcome/App.tsx`
 - Modify: `packages/desktop/src/renderer/welcome/main.tsx`
 - Modify: `packages/desktop/src/main/index.ts` — listen for mode pick
@@ -2627,6 +2779,7 @@ git commit -m "feat(desktop/renderer): tailwind base + log shim"
 - [ ] **Step 1: Welcome preload + api types**
 
 Add to `packages/desktop/src/shared/api-types.ts`:
+
 ```ts
 export type WelcomeApi = {
   mode: 'welcome'
@@ -2637,6 +2790,7 @@ export type WelcomeApi = {
 Change the global `window.api` union to include `WelcomeApi`.
 
 Create `packages/desktop/src/preload/welcome.ts`:
+
 ```ts
 import { contextBridge, ipcRenderer } from 'electron'
 import type { WelcomeApi } from '../shared/api-types.js'
@@ -2649,6 +2803,7 @@ contextBridge.exposeInMainWorld('api', api)
 ```
 
 Update `electron.vite.config.ts` preload input map:
+
 ```ts
 preload: { build: { rollupOptions: { input: {
   agent: resolve(__dirname, 'src/preload/agent.ts'),
@@ -2679,12 +2834,18 @@ export function WelcomeApp() {
         <h1 className="text-3xl font-semibold">desk-controller</h1>
         <p className="text-neutral-400">Choose how this instance will run.</p>
         <div className="flex gap-4 justify-center">
-          <button disabled={busy} onClick={() => pick('agent')}
-            className="px-6 py-3 rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-50">
+          <button
+            disabled={busy}
+            onClick={() => pick('agent')}
+            className="px-6 py-3 rounded bg-blue-600 hover:bg-blue-500 disabled:opacity-50"
+          >
             I want to be controlled (Agent)
           </button>
-          <button disabled={busy} onClick={() => pick('viewer')}
-            className="px-6 py-3 rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50">
+          <button
+            disabled={busy}
+            onClick={() => pick('viewer')}
+            className="px-6 py-3 rounded bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50"
+          >
             I want to control (Viewer)
           </button>
         </div>
@@ -2705,6 +2866,7 @@ createRoot(document.getElementById('root')!).render(<WelcomeApp />)
 - [ ] **Step 3: Main side — handle pick**
 
 `packages/desktop/src/main/ipc/welcome.ts`:
+
 ```ts
 import { ipcMain, app, BrowserWindow } from 'electron'
 import Store from 'electron-store'
@@ -2712,7 +2874,10 @@ import { makeWindow } from '../windows.js'
 
 type StoreShape = { mode?: 'agent' | 'viewer' }
 
-export function registerWelcomeHandlers(store: Store<StoreShape>, replace: (w: BrowserWindow | null) => void): void {
+export function registerWelcomeHandlers(
+  store: Store<StoreShape>,
+  replace: (w: BrowserWindow | null) => void,
+): void {
   ipcMain.handle('welcome:pick', async (e, mode: 'agent' | 'viewer') => {
     store.set('mode', mode)
     const sender = BrowserWindow.fromWebContents(e.sender)
@@ -2724,10 +2889,13 @@ export function registerWelcomeHandlers(store: Store<StoreShape>, replace: (w: B
 ```
 
 Wire it in `index.ts` whenReady:
+
 ```ts
 import { registerWelcomeHandlers } from './ipc/welcome.js'
 // inside whenReady, after creating mainWindow:
-registerWelcomeHandlers(store, (w) => { mainWindow = w })
+registerWelcomeHandlers(store, (w) => {
+  mainWindow = w
+})
 ```
 
 - [ ] **Step 4: Smoke**
@@ -2748,6 +2916,7 @@ git commit -m "feat(desktop): welcome screen with mode pick persisted to store"
 **Implements:** spec §10 (permission rows)
 
 **Files:**
+
 - Create: `packages/desktop/src/main/agent/permissions.ts`
 
 - [ ] **Step 1: Implement (macOS uses `systemPreferences`, Windows returns true)**
@@ -2773,6 +2942,7 @@ export function promptA11y(): void {
 - [ ] **Step 2: Wire IPC handler (only when mode === 'agent')**
 
 In `main/index.ts`, when mode is `agent`, register:
+
 ```ts
 import { ipcMain } from 'electron'
 import { checkPermissions } from './agent/permissions.js'
@@ -2793,7 +2963,7 @@ git commit -m "feat(desktop/agent): permission probe (macOS screen + a11y)"
 
 ### T29: Re-use `PairStore` in Agent main (no new code — verify wiring shape)
 
-**Note:** `PairStore` lives in `@desk/shared` (T14). No new code; this task is a placeholder for documentation referenced by T30. Skip to T30 directly. *(Counted to keep numbering stable.)*
+**Note:** `PairStore` lives in `@desk/shared` (T14). No new code; this task is a placeholder for documentation referenced by T30. Skip to T30 directly. _(Counted to keep numbering stable.)_
 
 ---
 
@@ -2802,6 +2972,7 @@ git commit -m "feat(desktop/agent): permission probe (macOS screen + a11y)"
 **Implements:** spec §8.1
 
 **Files:**
+
 - Create: `packages/desktop/src/main/agent/session-state.ts`
 - Create: `packages/desktop/tests/agent-session-state.test.ts`
 
@@ -2814,7 +2985,10 @@ import { AgentSession } from '../src/main/agent/session-state.js'
 import { PairStore, ErrorCode } from '@desk/shared'
 
 describe('AgentSession', () => {
-  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2026-01-01')) })
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date('2026-01-01'))
+  })
 
   it('starts in pairing phase with code', () => {
     const s = new AgentSession(new PairStore())
@@ -2910,7 +3084,9 @@ export class AgentSession {
     this.current = this.pairingState()
   }
 
-  get state(): AgentSessionState { return this.current }
+  get state(): AgentSessionState {
+    return this.current
+  }
 
   onChange(l: (s: AgentSessionState) => void): () => void {
     this.listeners.add(l)
@@ -2935,7 +3111,9 @@ export class AgentSession {
     this.set({ phase: 'active', viewerId: this.current.viewerId, since: Date.now() })
   }
 
-  iceFailed(): void { this.disconnect('ice-failed') }
+  iceFailed(): void {
+    this.disconnect('ice-failed')
+  }
 
   disconnect(reason: string): void {
     if (this.current.phase === 'disconnecting' || this.current.phase === 'pairing') return
@@ -2979,6 +3157,7 @@ git commit -m "feat(desktop/agent): session state machine"
 **Implements:** spec §6.3, §6.4
 
 **Files:**
+
 - Create: `packages/desktop/src/main/agent/signaling-host.ts`
 
 - [ ] **Step 1: Implement (no test — relies on @desk/signaling already tested)**
@@ -2994,7 +3173,9 @@ export async function startSignalingHost(): Promise<EmbeddedServerTransport> {
   const transport = new EmbeddedServerTransport({ host: '0.0.0.0', port: 0 })
   await transport.start()
   log.info('signaling: listening on', transport.port)
-  registerCleanup(async () => { await transport.stop() })
+  registerCleanup(async () => {
+    await transport.stop()
+  })
   return transport
 }
 
@@ -3028,6 +3209,7 @@ git commit -m "feat(desktop/agent): embed signaling ws server"
 ### T32: mDNS broadcast
 
 **Files:**
+
 - Create: `packages/desktop/src/main/agent/mdns-broadcast.ts`
 
 - [ ] **Step 1: Implement**
@@ -3071,6 +3253,7 @@ git commit -m "feat(desktop/agent): mDNS broadcast via bonjour-service"
 **Implements:** spec §6.2, §9.6
 
 **Files:**
+
 - Create: `packages/desktop/src/main/agent/input-injector.ts`
 
 - [ ] **Step 1: Implement**
@@ -3079,12 +3262,10 @@ git commit -m "feat(desktop/agent): mDNS broadcast via bonjour-service"
 // packages/desktop/src/main/agent/input-injector.ts
 import { mouse, keyboard, Button, Point, Key } from '@nut-tree-fork/nut-js'
 import { screen as electronScreen } from 'electron'
-import {
-  type MouseMsg, type KeyMsg, normalizedToScreen, clamp01, decodeMods,
-} from '@desk/shared'
+import { type MouseMsg, type KeyMsg, normalizedToScreen, clamp01, decodeMods } from '@desk/shared'
 import log from 'electron-log/main'
 
-mouse.config.mouseSpeed = 99999  // effectively immediate
+mouse.config.mouseSpeed = 99999 // effectively immediate
 mouse.config.autoDelayMs = 0
 keyboard.config.autoDelayMs = 0
 
@@ -3103,7 +3284,8 @@ const buttonMap: Record<0 | 1 | 2, Button> = {
 
 export async function handleMouse(msg: MouseMsg): Promise<void> {
   const size = display()
-  const x = clamp01(msg.x), y = clamp01(msg.y)
+  const x = clamp01(msg.x),
+    y = clamp01(msg.y)
   const { x: px, y: py } = normalizedToScreen({ x, y }, size)
   switch (msg.t) {
     case 'mm':
@@ -3161,7 +3343,12 @@ export async function handleKey(msg: KeyMsg): Promise<void> {
 export async function releaseAll(): Promise<void> {
   for (const k of [...pressedKeys]) {
     const key = mapCode(k)
-    if (key) try { await keyboard.releaseKey(key) } catch (e) { log.warn('releaseKey failed', e) }
+    if (key)
+      try {
+        await keyboard.releaseKey(key)
+      } catch (e) {
+        log.warn('releaseKey failed', e)
+      }
   }
   pressedKeys.clear()
 }
@@ -3191,19 +3378,40 @@ function mapCode(code: string): Key | undefined {
     return Key[k]
   }
   const direct: Record<string, Key> = {
-    Enter: Key.Enter, Tab: Key.Tab, Space: Key.Space, Backspace: Key.Backspace,
-    Escape: Key.Escape, ArrowUp: Key.Up, ArrowDown: Key.Down,
-    ArrowLeft: Key.Left, ArrowRight: Key.Right,
-    ShiftLeft: Key.LeftShift, ShiftRight: Key.RightShift,
-    ControlLeft: Key.LeftControl, ControlRight: Key.RightControl,
-    AltLeft: Key.LeftAlt, AltRight: Key.RightAlt,
-    MetaLeft: Key.LeftSuper, MetaRight: Key.RightSuper,
-    CapsLock: Key.CapsLock, Delete: Key.Delete, Home: Key.Home, End: Key.End,
-    PageUp: Key.PageUp, PageDown: Key.PageDown,
-    Comma: Key.Comma, Period: Key.Period, Slash: Key.Slash,
-    Semicolon: Key.Semicolon, Quote: Key.Quote,
-    BracketLeft: Key.LeftBracket, BracketRight: Key.RightBracket,
-    Backslash: Key.Backslash, Backquote: Key.Grave, Minus: Key.Minus, Equal: Key.Equal,
+    Enter: Key.Enter,
+    Tab: Key.Tab,
+    Space: Key.Space,
+    Backspace: Key.Backspace,
+    Escape: Key.Escape,
+    ArrowUp: Key.Up,
+    ArrowDown: Key.Down,
+    ArrowLeft: Key.Left,
+    ArrowRight: Key.Right,
+    ShiftLeft: Key.LeftShift,
+    ShiftRight: Key.RightShift,
+    ControlLeft: Key.LeftControl,
+    ControlRight: Key.RightControl,
+    AltLeft: Key.LeftAlt,
+    AltRight: Key.RightAlt,
+    MetaLeft: Key.LeftSuper,
+    MetaRight: Key.RightSuper,
+    CapsLock: Key.CapsLock,
+    Delete: Key.Delete,
+    Home: Key.Home,
+    End: Key.End,
+    PageUp: Key.PageUp,
+    PageDown: Key.PageDown,
+    Comma: Key.Comma,
+    Period: Key.Period,
+    Slash: Key.Slash,
+    Semicolon: Key.Semicolon,
+    Quote: Key.Quote,
+    BracketLeft: Key.LeftBracket,
+    BracketRight: Key.RightBracket,
+    Backslash: Key.Backslash,
+    Backquote: Key.Grave,
+    Minus: Key.Minus,
+    Equal: Key.Equal,
   }
   return direct[code]
 }
@@ -3226,6 +3434,7 @@ git commit -m "feat(desktop/agent): nut-js input injector with key code mapping"
 ### T34: Wire Agent main: signaling + state machine + permissions + cleanup
 
 **Files:**
+
 - Create: `packages/desktop/src/main/agent/bootstrap.ts`
 - Modify: `packages/desktop/src/main/index.ts`
 
@@ -3259,7 +3468,12 @@ export async function bootstrapAgent(getWin: () => BrowserWindow | null): Promis
     pushAgentEvent(getWin(), { type: 'signaling:in', payload: msg })
     if (msg.t === 'pair-request') {
       const result = session.tryPair(msg.code, 'viewer')
-      sendOut({ v: 1, t: 'pair-result', ok: result.ok, ...(result.ok ? {} : { reason: result.reason }) })
+      sendOut({
+        v: 1,
+        t: 'pair-result',
+        ok: result.ok,
+        ...(result.ok ? {} : { reason: result.reason }),
+      })
     } else if (msg.t === 'bye') {
       session.disconnect('viewer-bye')
     } else if (msg.t === 'ping') {
@@ -3286,7 +3500,11 @@ export async function bootstrapAgent(getWin: () => BrowserWindow | null): Promis
   onInvoke(IPC.PermissionCheck, () => checkPermissions())
 
   registerCleanup(async () => {
-    try { await releaseAll() } catch (e) { log.error('releaseAll failed', e) }
+    try {
+      await releaseAll()
+    } catch (e) {
+      log.error('releaseAll failed', e)
+    }
     sendOut({ v: 1, t: 'bye', reason: 'agent-quit' })
   })
 }
@@ -3317,6 +3535,7 @@ git commit -m "feat(desktop/agent): bootstrap wires signaling/state/input/perms"
 **Implements:** spec §6.1
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/agent/capture.ts`
 
 - [ ] **Step 1: Implement**
@@ -3359,6 +3578,7 @@ git commit -m "feat(desktop/agent): screen capture stream"
 **Implements:** spec §9.3
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/shared/webrtc/sdp-munge.ts`
 - Create: `packages/desktop/src/renderer/shared/webrtc/sender-params.ts`
 - Create: `packages/desktop/tests/sdp-munge.test.ts`
@@ -3397,6 +3617,7 @@ describe('preferCodec', () => {
 ```
 
 Vitest renderer test needs jsdom — update `packages/desktop/vitest.config.ts`:
+
 ```ts
 import { defineConfig } from 'vitest/config'
 export default defineConfig({
@@ -3456,9 +3677,7 @@ import { VIDEO_MAX_BITRATE_BPS, VIDEO_MAX_FRAMERATE } from '@desk/shared'
 
 export async function tuneVideoSender(sender: RTCRtpSender): Promise<void> {
   const params = sender.getParameters()
-  params.encodings = params.encodings.length
-    ? params.encodings
-    : [{}]
+  params.encodings = params.encodings.length ? params.encodings : [{}]
   for (const enc of params.encodings) {
     enc.maxBitrate = VIDEO_MAX_BITRATE_BPS
     enc.maxFramerate = VIDEO_MAX_FRAMERATE
@@ -3483,6 +3702,7 @@ git commit -m "feat(desktop/renderer): sdp codec preference + sender tuning"
 **Implements:** spec §6.4 (Agent side)
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/agent/pc-controller.ts`
 - Create: `packages/desktop/src/renderer/agent/store.ts`
 
@@ -3530,9 +3750,13 @@ export async function startOffer(): Promise<void> {
     dc.binaryType = 'arraybuffer'
     dc.onmessage = (ev) => {
       try {
-        const m = JSON.parse(typeof ev.data === 'string' ? ev.data : new TextDecoder().decode(ev.data)) as MouseMsg | KeyMsg
+        const m = JSON.parse(
+          typeof ev.data === 'string' ? ev.data : new TextDecoder().decode(ev.data),
+        ) as MouseMsg | KeyMsg
         api.inputEvent(m)
-      } catch { /* drop */ }
+      } catch {
+        /* drop */
+      }
     }
   }
 
@@ -3560,7 +3784,11 @@ export async function applyAnswer(sdp: string): Promise<void> {
 
 export async function addRemoteIce(candidate: RTCIceCandidateInit): Promise<void> {
   if (!pc) return
-  try { await pc.addIceCandidate(candidate) } catch { /* ignore */ }
+  try {
+    await pc.addIceCandidate(candidate)
+  } catch {
+    /* ignore */
+  }
 }
 
 export async function close(): Promise<void> {
@@ -3573,6 +3801,7 @@ export async function close(): Promise<void> {
 - [ ] **Step 3: Renderer entry**
 
 `packages/desktop/src/renderer/agent/main.tsx`:
+
 ```tsx
 import { createRoot } from 'react-dom/client'
 import { AgentApp } from './App.js'
@@ -3597,6 +3826,7 @@ git commit -m "feat(desktop/agent): PC controller (offerer) + input DC forwarder
 **Implements:** spec §12.1
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/agent/App.tsx`
 - Create: `packages/desktop/src/renderer/agent/components/StatusBadge.tsx`
 
@@ -3607,9 +3837,7 @@ git commit -m "feat(desktop/agent): PC controller (offerer) + input DC forwarder
 type Props = { phase: string }
 export function StatusBadge({ phase }: Props) {
   const color =
-    phase === 'active' ? 'bg-red-600'
-    : phase === 'pairing' ? 'bg-emerald-600'
-    : 'bg-amber-600'
+    phase === 'active' ? 'bg-red-600' : phase === 'pairing' ? 'bg-emerald-600' : 'bg-amber-600'
   return <span className={`px-2 py-1 rounded text-xs ${color}`}>{phase}</span>
 }
 ```
@@ -3640,7 +3868,9 @@ export function AgentApp() {
         else if (m.t === 'ice') void addRemoteIce(m.candidate)
       }
     })
-    return () => { unsub() }
+    return () => {
+      unsub()
+    }
   }, [api, setSession])
 
   const phase = session?.phase ?? 'pairing'
@@ -3665,7 +3895,8 @@ export function AgentApp() {
       <button
         onClick={() => api.sessionEnd('user')}
         disabled={phase !== 'active'}
-        className="self-start px-4 py-2 rounded bg-red-700 hover:bg-red-600 disabled:opacity-40">
+        className="self-start px-4 py-2 rounded bg-red-700 hover:bg-red-600 disabled:opacity-40"
+      >
         Disconnect
       </button>
     </main>
@@ -3691,6 +3922,7 @@ git commit -m "feat(desktop/agent): main UI with pair code and status"
 **Implements:** spec §12.1 (HUD)
 
 **Files:**
+
 - Modify: `packages/desktop/src/main/windows.ts` (add `makeHudWindow`)
 - Modify: `packages/desktop/src/main/agent/bootstrap.ts` (open/close on state change)
 - Create: `packages/desktop/src/renderer/agent/hud.html`
@@ -3699,14 +3931,22 @@ git commit -m "feat(desktop/agent): main UI with pair code and status"
 - [ ] **Step 1: HUD factory**
 
 Append to `windows.ts`:
+
 ```ts
 export function makeHudWindow(): BrowserWindow {
   const win = new BrowserWindow({
-    width: 220, height: 56, frame: false, resizable: false,
-    alwaysOnTop: true, transparent: true, skipTaskbar: true,
+    width: 220,
+    height: 56,
+    frame: false,
+    resizable: false,
+    alwaysOnTop: true,
+    transparent: true,
+    skipTaskbar: true,
     webPreferences: {
       preload: join(PRELOAD_DIR, 'agent.js'),
-      sandbox: true, contextIsolation: true, nodeIntegration: false,
+      sandbox: true,
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   })
   if (process.env.ELECTRON_RENDERER_URL) {
@@ -3724,13 +3964,23 @@ Register `hud` in `electron.vite.config.ts` renderer inputs.
 - [ ] **Step 2: HUD html + entry**
 
 `packages/desktop/src/renderer/agent/hud.html`:
+
 ```html
 <!doctype html>
-<html><head><meta charset="utf-8" /><title>HUD</title></head>
-<body><div id="root"></div><script type="module" src="/agent/hud/main.tsx"></script></body></html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>HUD</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/agent/hud/main.tsx"></script>
+  </body>
+</html>
 ```
 
 `packages/desktop/src/renderer/agent/hud/main.tsx`:
+
 ```tsx
 import { createRoot } from 'react-dom/client'
 import { useEffect, useState } from 'react'
@@ -3740,13 +3990,19 @@ import '../../styles.css'
 function Hud() {
   const api = getAgentApi()
   const [phase, setPhase] = useState<string>('?')
-  useEffect(() => api.onEvent((e) => {
-    if (e.type === 'session:state') setPhase((e.payload as { phase: string }).phase)
-  }), [api])
+  useEffect(
+    () =>
+      api.onEvent((e) => {
+        if (e.type === 'session:state') setPhase((e.payload as { phase: string }).phase)
+      }),
+    [api],
+  )
   return (
     <div className="bg-red-700/90 text-white px-3 py-2 rounded flex items-center justify-between h-full">
       <span>● being controlled ({phase})</span>
-      <button onClick={() => api.sessionEnd('hud')} className="bg-white/20 px-2 py-1 rounded">Stop</button>
+      <button onClick={() => api.sessionEnd('hud')} className="bg-white/20 px-2 py-1 rounded">
+        Stop
+      </button>
     </div>
   )
 }
@@ -3756,12 +4012,16 @@ createRoot(document.getElementById('root')!).render(<Hud />)
 - [ ] **Step 3: Open/close HUD on phase change**
 
 In `bootstrap.ts`, after `session.onChange(...)`, add:
+
 ```ts
 import { makeHudWindow } from '../windows.js'
 let hud: BrowserWindow | null = null
 session.onChange((state) => {
   if (state.phase === 'active' && !hud) hud = makeHudWindow()
-  if (state.phase === 'pairing' && hud) { hud.close(); hud = null }
+  if (state.phase === 'pairing' && hud) {
+    hud.close()
+    hud = null
+  }
 })
 ```
 
@@ -3784,6 +4044,7 @@ git commit -m "feat(desktop/agent): HUD overlay window during active sessions"
 **Implements:** spec §12.2 (discovery)
 
 **Files:**
+
 - Create: `packages/desktop/src/main/viewer/mdns-browse.ts`
 
 - [ ] **Step 1: Implement**
@@ -3807,9 +4068,15 @@ export function browse(onChange: (list: Found[]) => void): void {
     list.set(svc.fqdn, { name: svc.name, host, port: svc.port })
     emit()
   })
-  browser.on('down', (svc) => { list.delete(svc.fqdn); emit() })
+  browser.on('down', (svc) => {
+    list.delete(svc.fqdn)
+    emit()
+  })
   browser.start()
-  registerCleanup(() => { browser.stop(); bonjour.destroy() })
+  registerCleanup(() => {
+    browser.stop()
+    bonjour.destroy()
+  })
 }
 ```
 
@@ -3828,6 +4095,7 @@ git commit -m "feat(desktop/viewer): mDNS browser"
 **Implements:** spec §6.3, §6.4
 
 **Files:**
+
 - Create: `packages/desktop/src/main/viewer/bootstrap.ts`
 - Modify: `packages/desktop/src/main/index.ts`
 
@@ -3853,7 +4121,8 @@ export function bootstrapViewer(getWin: () => BrowserWindow | null): void {
     client = new EmbeddedClientTransport({ host: p.agentHost, port: p.port })
     client.onMessage((m) => pushViewerEvent(getWin(), { type: 'signaling:in', payload: m }))
     client.onConnectionState((s) => {
-      if (s === 'closed') pushViewerEvent(getWin(), { type: 'signaling:in', payload: { v: 1, t: 'bye' } })
+      if (s === 'closed')
+        pushViewerEvent(getWin(), { type: 'signaling:in', payload: { v: 1, t: 'bye' } })
     })
     await client.start()
     client.send({ v: 1, t: 'hello', role: 'viewer', clientId: Math.random().toString(36).slice(2) })
@@ -3861,9 +4130,17 @@ export function bootstrapViewer(getWin: () => BrowserWindow | null): void {
   })
 
   onSend(IPC.SignalingOut, (_e, ...args: unknown[]) => client?.send(args[0] as SignalingMessage))
-  onSend(IPC.SessionEnd, () => { void client?.stop(); client = null })
+  onSend(IPC.SessionEnd, () => {
+    void client?.stop()
+    client = null
+  })
 
-  registerCleanup(async () => { if (client) { client.send({ v: 1, t: 'bye' }); await client.stop() } })
+  registerCleanup(async () => {
+    if (client) {
+      client.send({ v: 1, t: 'bye' })
+      await client.stop()
+    }
+  })
 }
 ```
 
@@ -3888,6 +4165,7 @@ git commit -m "feat(desktop/viewer): bootstrap with discovery + signaling client
 ### T42: Viewer renderer — PC controller (answerer)
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/viewer/pc-controller.ts`
 - Create: `packages/desktop/src/renderer/viewer/store.ts`
 
@@ -3952,7 +4230,10 @@ export async function applyOffer(sdp: string): Promise<void> {
   pc.onconnectionstatechange = () => {
     if (!pc) return
     if (pc.connectionState === 'connected') set.setPhase('streaming')
-    if (pc.connectionState === 'failed') { set.setPhase('failed'); api.sessionEnd('ice-failed') }
+    if (pc.connectionState === 'failed') {
+      set.setPhase('failed')
+      api.sessionEnd('ice-failed')
+    }
   }
 
   await pc.setRemoteDescription({ type: 'offer', sdp })
@@ -3964,7 +4245,11 @@ export async function applyOffer(sdp: string): Promise<void> {
 
 export async function addRemoteIce(candidate: RTCIceCandidateInit): Promise<void> {
   if (!pc) return
-  try { await pc.addIceCandidate(candidate) } catch { /* ignore */ }
+  try {
+    await pc.addIceCandidate(candidate)
+  } catch {
+    /* ignore */
+  }
 }
 
 export async function close(): Promise<void> {
@@ -3976,7 +4261,9 @@ export async function close(): Promise<void> {
   setPhase('idle')
 }
 
-export function getPc(): RTCPeerConnection | null { return pc }
+export function getPc(): RTCPeerConnection | null {
+  return pc
+}
 ```
 
 - [ ] **Step 3: Commit**
@@ -3994,6 +4281,7 @@ git commit -m "feat(desktop/viewer): PC controller (answerer) + zustand store"
 **Implements:** spec §9.4
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/viewer/input-sender.ts`
 - Create: `packages/desktop/tests/throttler.test.ts`
 
@@ -4029,8 +4317,13 @@ describe('mouse throttler', () => {
 // packages/desktop/src/renderer/viewer/input-sender.ts
 import { useViewerStore } from './store.js'
 import {
-  type MouseMsg, type KeyMsg, encodeMods, computeContentRect, clamp01,
-  MODIFIER_SYNC_INTERVAL_MS, MOUSE_BUFFER_THRESHOLD_BYTES,
+  type MouseMsg,
+  type KeyMsg,
+  encodeMods,
+  computeContentRect,
+  clamp01,
+  MODIFIER_SYNC_INTERVAL_MS,
+  MOUSE_BUFFER_THRESHOLD_BYTES,
 } from '@desk/shared'
 
 export type MouseThrottlerOpts = {
@@ -4080,11 +4373,21 @@ export function bindViewerInputs(videoEl: HTMLVideoElement): () => void {
     }
   }
   const buttonMap: Record<number, 0 | 1 | 2> = { 0: 0, 1: 1, 2: 2 }
-  const onMove = (e: MouseEvent) => { const p = toNorm(e); if (p) throttledMove(p) }
-  const onDown = (e: MouseEvent) => { const p = toNorm(e); if (p) sendMouse({ t: 'md', ...p, b: buttonMap[e.button] ?? 0 }) }
-  const onUp = (e: MouseEvent) => { const p = toNorm(e); if (p) sendMouse({ t: 'mu', ...p, b: buttonMap[e.button] ?? 0 }) }
+  const onMove = (e: MouseEvent) => {
+    const p = toNorm(e)
+    if (p) throttledMove(p)
+  }
+  const onDown = (e: MouseEvent) => {
+    const p = toNorm(e)
+    if (p) sendMouse({ t: 'md', ...p, b: buttonMap[e.button] ?? 0 })
+  }
+  const onUp = (e: MouseEvent) => {
+    const p = toNorm(e)
+    if (p) sendMouse({ t: 'mu', ...p, b: buttonMap[e.button] ?? 0 })
+  }
   const onWheel = (e: WheelEvent) => {
-    const p = toNorm(e); if (!p) return
+    const p = toNorm(e)
+    if (!p) return
     const lines = (n: number) => Math.sign(n) * Math.max(1, Math.round(Math.abs(n) / 100))
     sendMouse({ t: 'mw', ...p, dx: lines(e.deltaX), dy: lines(e.deltaY) })
     e.preventDefault()
@@ -4092,9 +4395,13 @@ export function bindViewerInputs(videoEl: HTMLVideoElement): () => void {
   const onContext = (e: MouseEvent) => e.preventDefault()
 
   const pressed = new Set<string>()
-  const modsBitmap = (e: KeyboardEvent) => encodeMods({
-    shift: e.shiftKey, ctrl: e.ctrlKey, alt: e.altKey, meta: e.metaKey,
-  })
+  const modsBitmap = (e: KeyboardEvent) =>
+    encodeMods({
+      shift: e.shiftKey,
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      meta: e.metaKey,
+    })
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.isComposing) return // IME guard
     pressed.add(e.code)
@@ -4151,6 +4458,7 @@ git commit -m "feat(desktop/viewer): input sender with throttling and IME guard"
 **Implements:** spec §12.2, §13
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/shared/webrtc/stats.ts`
 
 - [ ] **Step 1: Implement**
@@ -4166,7 +4474,14 @@ export type LiveStats = {
   height: number | null
 }
 
-const empty: LiveStats = { rttMs: null, fps: null, bitrateKbps: null, lossPct: null, width: null, height: null }
+const empty: LiveStats = {
+  rttMs: null,
+  fps: null,
+  bitrateKbps: null,
+  lossPct: null,
+  width: null,
+  height: null,
+}
 
 export function startStats(pc: RTCPeerConnection, onUpdate: (s: LiveStats) => void): () => void {
   let lastBytes = 0
@@ -4188,7 +4503,9 @@ export function startStats(pc: RTCPeerConnection, onUpdate: (s: LiveStats) => vo
         snap.fps = fps !== null ? Math.round(fps) : null
         snap.width = (r as RTCInboundRtpStreamStats).frameWidth ?? null
         snap.height = (r as RTCInboundRtpStreamStats).frameHeight ?? null
-        lastBytes = bytes; lastPackets = packets; lastLost = lost
+        lastBytes = bytes
+        lastPackets = packets
+        lastLost = lost
       }
       if (r.type === 'candidate-pair' && (r as RTCIceCandidatePairStats).nominated) {
         snap.rttMs = Math.round(((r as RTCIceCandidatePairStats).currentRoundTripTime ?? 0) * 1000)
@@ -4196,7 +4513,12 @@ export function startStats(pc: RTCPeerConnection, onUpdate: (s: LiveStats) => vo
     })
     onUpdate(snap)
   }, 1000)
-  return () => { if (timer) { clearInterval(timer); timer = null } }
+  return () => {
+    if (timer) {
+      clearInterval(timer)
+      timer = null
+    }
+  }
 }
 ```
 
@@ -4215,6 +4537,7 @@ git commit -m "feat(desktop/renderer): WebRTC stats poller"
 **Implements:** spec §12.2
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/viewer/App.tsx`
 - Create: `packages/desktop/src/renderer/viewer/components/DiscoveryList.tsx`
 - Create: `packages/desktop/src/renderer/viewer/components/PairForm.tsx`
@@ -4232,10 +4555,14 @@ export function DiscoveryList({ items, onPick }: Props) {
     <ul className="space-y-2">
       {items.map((it) => (
         <li key={`${it.host}:${it.port}`}>
-          <button onClick={() => onPick(it)}
-            className="w-full text-left p-3 rounded bg-neutral-900 hover:bg-neutral-800">
+          <button
+            onClick={() => onPick(it)}
+            className="w-full text-left p-3 rounded bg-neutral-900 hover:bg-neutral-800"
+          >
             <div className="font-medium">{it.name}</div>
-            <div className="text-xs text-neutral-500">{it.host}:{it.port}</div>
+            <div className="text-xs text-neutral-500">
+              {it.host}:{it.port}
+            </div>
           </button>
         </li>
       ))}
@@ -4249,20 +4576,45 @@ export function DiscoveryList({ items, onPick }: Props) {
 ```tsx
 // packages/desktop/src/renderer/viewer/components/PairForm.tsx
 import { useState } from 'react'
-type Props = { initial?: { host?: string; port?: number }; onSubmit: (p: { host: string; port: number; code: string }) => void }
+type Props = {
+  initial?: { host?: string; port?: number }
+  onSubmit: (p: { host: string; port: number; code: string }) => void
+}
 export function PairForm({ initial, onSubmit }: Props) {
   const [host, setHost] = useState(initial?.host ?? '')
   const [port, setPort] = useState<number>(initial?.port ?? 0)
   const [code, setCode] = useState('')
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit({ host, port, code: code.toUpperCase() }) }}
-      className="space-y-3">
-      <input value={host} onChange={(e) => setHost(e.target.value)} placeholder="Agent host" required
-        className="w-full p-2 rounded bg-neutral-900" />
-      <input value={port || ''} onChange={(e) => setPort(Number(e.target.value))} placeholder="Port" type="number" required
-        className="w-full p-2 rounded bg-neutral-900" />
-      <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Pair code (6 chars)" required maxLength={6}
-        className="w-full p-2 rounded bg-neutral-900 tracking-widest uppercase" />
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        onSubmit({ host, port, code: code.toUpperCase() })
+      }}
+      className="space-y-3"
+    >
+      <input
+        value={host}
+        onChange={(e) => setHost(e.target.value)}
+        placeholder="Agent host"
+        required
+        className="w-full p-2 rounded bg-neutral-900"
+      />
+      <input
+        value={port || ''}
+        onChange={(e) => setPort(Number(e.target.value))}
+        placeholder="Port"
+        type="number"
+        required
+        className="w-full p-2 rounded bg-neutral-900"
+      />
+      <input
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        placeholder="Pair code (6 chars)"
+        required
+        maxLength={6}
+        className="w-full p-2 rounded bg-neutral-900 tracking-widest uppercase"
+      />
       <button className="px-4 py-2 rounded bg-emerald-600 hover:bg-emerald-500">Connect</button>
     </form>
   )
@@ -4284,20 +4636,30 @@ export function ViewerApp() {
   const api = getViewerApi()
   const { agents, phase, setAgents, setPhase } = useViewerStore()
 
-  useEffect(() => api.onEvent((e) => {
-    if (e.type === 'discovery:found') setAgents(e.payload)
-    else if (e.type === 'signaling:in') {
-      const m = e.payload
-      if (m.t === 'offer') { void applyOffer(m.sdp); setPhase('negotiating') }
-      else if (m.t === 'ice') void addRemoteIce(m.candidate)
-      else if (m.t === 'pair-result' && !m.ok) setPhase('failed')
-      else if (m.t === 'bye') setPhase('idle')
-    }
-  }), [api, setAgents, setPhase])
+  useEffect(
+    () =>
+      api.onEvent((e) => {
+        if (e.type === 'discovery:found') setAgents(e.payload)
+        else if (e.type === 'signaling:in') {
+          const m = e.payload
+          if (m.t === 'offer') {
+            void applyOffer(m.sdp)
+            setPhase('negotiating')
+          } else if (m.t === 'ice') void addRemoteIce(m.candidate)
+          else if (m.t === 'pair-result' && !m.ok) setPhase('failed')
+          else if (m.t === 'bye') setPhase('idle')
+        }
+      }),
+    [api, setAgents, setPhase],
+  )
 
   // StreamView is wired in T46; for now show a placeholder during streaming phases.
   if (phase === 'streaming' || phase === 'negotiating') {
-    return <div className="h-full flex items-center justify-center text-neutral-500">Streaming… (StreamView in T46)</div>
+    return (
+      <div className="h-full flex items-center justify-center text-neutral-500">
+        Streaming… (StreamView in T46)
+      </div>
+    )
   }
 
   const connect = (p: { host: string; port: number; code: string }) => {
@@ -4309,10 +4671,13 @@ export function ViewerApp() {
     <main className="h-full p-8 grid grid-cols-2 gap-8">
       <section>
         <h2 className="text-lg mb-3">Discovered Agents</h2>
-        <DiscoveryList items={agents} onPick={(it) => {
-          const code = prompt(`Pair code for ${it.name}`)
-          if (code) connect({ host: it.host, port: it.port, code: code.toUpperCase() })
-        }} />
+        <DiscoveryList
+          items={agents}
+          onPick={(it) => {
+            const code = prompt(`Pair code for ${it.name}`)
+            if (code) connect({ host: it.host, port: it.port, code: code.toUpperCase() })
+          }}
+        />
       </section>
       <section>
         <h2 className="text-lg mb-3">Manual</h2>
@@ -4345,6 +4710,7 @@ git commit -m "feat(desktop/viewer): discovery + pair UI"
 ### T46: Viewer UI — StreamView
 
 **Files:**
+
 - Create: `packages/desktop/src/renderer/viewer/components/StreamView.tsx`
 - Create: `packages/desktop/src/renderer/viewer/components/StatsBar.tsx`
 - Modify: `packages/desktop/src/renderer/viewer/App.tsx` (replace the T45 placeholder with `<StreamView />`)
@@ -4362,10 +4728,16 @@ export function StatsBar({ stats, onDisconnect, onFullscreen }: Props) {
       <span>{stats.fps ?? '–'}fps</span>
       <span>{stats.bitrateKbps ?? '–'}kbps</span>
       <span>loss {stats.lossPct ?? '–'}%</span>
-      <span>{stats.width ?? '–'}×{stats.height ?? '–'}</span>
+      <span>
+        {stats.width ?? '–'}×{stats.height ?? '–'}
+      </span>
       <div className="ml-auto flex gap-2">
-        <button onClick={onFullscreen} className="px-2 py-1 bg-neutral-700 rounded">Fullscreen</button>
-        <button onClick={onDisconnect} className="px-2 py-1 bg-red-700 rounded">Disconnect</button>
+        <button onClick={onFullscreen} className="px-2 py-1 bg-neutral-700 rounded">
+          Fullscreen
+        </button>
+        <button onClick={onDisconnect} className="px-2 py-1 bg-red-700 rounded">
+          Disconnect
+        </button>
       </div>
     </div>
   )
@@ -4388,7 +4760,14 @@ export function StreamView() {
   const api = getViewerApi()
   const stream = useViewerStore((s) => s.stream)
   const ref = useRef<HTMLVideoElement>(null)
-  const [stats, setStats] = useState<LiveStats>({ rttMs: null, fps: null, bitrateKbps: null, lossPct: null, width: null, height: null })
+  const [stats, setStats] = useState<LiveStats>({
+    rttMs: null,
+    fps: null,
+    bitrateKbps: null,
+    lossPct: null,
+    width: null,
+    height: null,
+  })
 
   useEffect(() => {
     if (ref.current && stream) ref.current.srcObject = stream
@@ -4399,17 +4778,30 @@ export function StreamView() {
     const unbindInputs = bindViewerInputs(ref.current)
     const pc = getPc()
     const stopStats = pc ? startStats(pc, setStats) : () => undefined
-    return () => { unbindInputs(); stopStats() }
+    return () => {
+      unbindInputs()
+      stopStats()
+    }
   }, [stream])
 
   return (
     <div className="h-full flex flex-col">
       <StatsBar
         stats={stats}
-        onDisconnect={() => { api.sessionEnd('user'); void closePc() }}
+        onDisconnect={() => {
+          api.sessionEnd('user')
+          void closePc()
+        }}
         onFullscreen={() => ref.current?.requestFullscreen()}
       />
-      <video ref={ref} autoPlay playsInline muted className="flex-1 bg-black object-contain" tabIndex={0} />
+      <video
+        ref={ref}
+        autoPlay
+        playsInline
+        muted
+        className="flex-1 bg-black object-contain"
+        tabIndex={0}
+      />
     </div>
   )
 }
@@ -4418,11 +4810,13 @@ export function StreamView() {
 - [ ] **Step 3: Replace placeholder in `App.tsx`**
 
 In `packages/desktop/src/renderer/viewer/App.tsx`, add at top:
+
 ```tsx
 import { StreamView } from './components/StreamView.js'
 ```
 
 Replace the streaming-phase placeholder block:
+
 ```tsx
 if (phase === 'streaming' || phase === 'negotiating') return <StreamView />
 ```
@@ -4519,6 +4913,7 @@ For any failure, open `docs/specs/2026-05-17-known-issues.md` (create if absent)
 ### T51: README run/test instructions
 
 **Files:**
+
 - Modify: `README.md`
 
 - [ ] **Step 1: Update README to include**

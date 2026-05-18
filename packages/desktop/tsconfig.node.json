@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "rootDir": ".",
+    "outDir": "dist-node",
+    "types": ["node", "vitest/globals"]
+  },
+  "include": [
+    "electron.vite.config.ts",
+    "src/main/**/*",
+    "src/preload/**/*",
+    "src/renderer/agent/pc-controller.ts",
+    "src/renderer/shared/webrtc/**/*.ts",
+    "src/renderer/viewer/pc-controller.ts",
+    "src/renderer/viewer/input-sender.ts",
+    "src/renderer/viewer/input-key-state.ts",
+    "src/renderer/viewer/editable-target.ts",
+    "src/shared/**/*",
+    "tests/**/*"
+  ]
+}

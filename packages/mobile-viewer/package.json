@@ -1,0 +1,46 @@
+{
+  "name": "@desk/mobile-viewer",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start:native": "react-native start --host 0.0.0.0",
+    "e2e:native:ios": "node scripts/run-native-e2e.mjs ios",
+    "e2e:native:android": "node scripts/run-native-e2e.mjs android",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.native.json --noEmit",
+    "lint": "eslint src tests",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@desk/shared": "workspace:*",
+    "@desk/signaling": "workspace:*",
+    "@react-native/new-app-screen": "0.85.3",
+    "react": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "^5.5.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@babel/runtime": "^7.25.0",
+    "@desk/relay-server": "workspace:*",
+    "@react-native/babel-preset": "0.85.3",
+    "@react-native/community-cli-plugin": "0.85.3",
+    "@react-native/metro-config": "0.85.3",
+    "@react-native/typescript-config": "0.85.3",
+    "@react-native-community/cli": "20.1.0",
+    "@react-native-community/cli-platform-android": "20.1.0",
+    "@react-native-community/cli-platform-ios": "20.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.2.0",
+    "@types/ws": "^8.5.13",
+    "metro-config": "^0.83.3",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.0",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=22.11.0"
+  }
+}

@@ -1,0 +1,25 @@
+appId: com.deskcontroller.mobileviewer
+env:
+  HOST: 127.0.0.1
+  PORT: '49831'
+  PAIR_CODE: RNM2E2
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: host-input
+- eraseText
+- inputText: ${HOST}
+- tapOn:
+    id: port-input
+- eraseText
+- inputText: ${PORT}
+- tapOn:
+    id: pair-code-input
+- eraseText
+- inputText: ${PAIR_CODE}
+- hideKeyboard
+- tapOn:
+    id: connect-button
+- assertVisible: streaming
+- assertVisible: rn-remote-stream

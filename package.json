@@ -23,6 +23,7 @@
     "release:prepare": "node scripts/prepare-release.mjs",
     "release:build": "pnpm package:desktop && pnpm package:android && pnpm package:ios:sim && pnpm release:prepare",
     "release:build:signed": "pnpm package:desktop && pnpm package:android && pnpm package:ios:ipa && pnpm release:prepare",
+    "release:github": "node scripts/publish-github-release.mjs",
     "e2e": "pnpm e2e:m1 && pnpm e2e:m1:real",
     "e2e:m1": "pnpm --filter @desk/desktop test -- tests/m1-e2e.test.ts",
     "e2e:m1:real": "pnpm --filter @desk/desktop build && playwright test -c packages/desktop/playwright.config.ts",

@@ -8,6 +8,7 @@
     "start:native": "react-native start --host 0.0.0.0",
     "package:android": "node scripts/package-native.mjs android",
     "package:ios:sim": "node scripts/package-native.mjs ios-sim",
+    "package:ios:ipa": "node scripts/package-native.mjs ios-ipa",
     "e2e:native:ios": "node scripts/run-native-e2e.mjs ios",
     "e2e:native:android": "node scripts/run-native-e2e.mjs android",
     "e2e:native:real:ios": "node scripts/run-native-real-e2e.mjs ios",

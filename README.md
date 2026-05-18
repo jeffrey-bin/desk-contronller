@@ -16,6 +16,8 @@ See the [M1 design spec](docs/specs/2026-05-17-remote-desktop-design.md) and
 - Node.js 20.11+
 - pnpm 9+
 - macOS 12+ or Windows 10+
+- Xcode 16+ for iOS Simulator builds and signed iOS archives
+- Android SDK plus JDK 17 for Android release builds
 
 ## Install
 
@@ -40,6 +42,49 @@ directories.
 3. Terminal B: run `pnpm dev:viewer`, choose the Agent from the discovery list, and enter the code.
 4. The Agent screen appears in the Viewer. Mouse and keyboard events are forwarded over WebRTC data channels.
 
+## Package Release Builds
+
+Build the desktop apps, Android APK, iOS Simulator app, and a local release
+handoff directory:
+
+```bash
+pnpm release:build
+```
+
+The handoff directory is `release/` and contains:
+
+- `DeskController-Agent-mac-*.zip`
+- `DeskController-Viewer-mac-*.zip`
+- `DeskMobileViewer-Android-release.apk`
+- `DeskMobileViewer-iOS-Simulator.zip`
+- `README.md` with the tester-facing install flow
+
+Build a TestFlight/App Store IPA on a Mac with Apple signing configured:
+
+```bash
+IOS_TEAM_ID=YOUR_TEAM_ID \
+IOS_BUNDLE_ID=com.yourcompany.deskcontroller.viewer \
+pnpm package:ios:ipa
+
+pnpm release:prepare
+```
+
+For CI or a clean signing machine, App Store Connect API credentials can be used
+instead of an interactive Xcode account:
+
+```bash
+IOS_TEAM_ID=YOUR_TEAM_ID \
+IOS_BUNDLE_ID=com.yourcompany.deskcontroller.viewer \
+ASC_KEY_PATH=/absolute/path/AuthKey_XXXXXXXXXX.p8 \
+ASC_KEY_ID=XXXXXXXXXX \
+ASC_ISSUER_ID=00000000-0000-0000-0000-000000000000 \
+pnpm package:ios:ipa
+```
+
+`pnpm package:ios:ipa` exports with `IOS_EXPORT_METHOD=app-store-connect` by
+default. Override `IOS_EXPORT_METHOD`, `IOS_SIGNING_STYLE`, or
+`IOS_PROVISIONING_PROFILE_SPECIFIER` when using manual signing.
+
 ## Verify
 
 ```bash
@@ -48,6 +93,10 @@ pnpm lint
 pnpm test
 pnpm e2e:m1
 pnpm e2e:m1:real
+pnpm package:desktop
+pnpm package:android
+pnpm package:ios:sim
+pnpm release:prepare
 ```
 
 M2 relay smoke:
@@ -77,6 +126,48 @@ Use two app instances on the same LAN:
 11. Start a second Viewer and confirm it is rejected while the first Viewer is active.
 12. Hold Shift, close Viewer abruptly, and confirm the Agent does not keep Shift pressed.
 13. Briefly interrupt the network and confirm both sides recover or fail cleanly.
+
+## Interviewer Release Test Plan
+
+Use the files in `release/`.
+
+Desktop-to-desktop:
+
+1. Unzip `DeskController-Agent-mac-*.zip` and `DeskController-Viewer-mac-*.zip`.
+2. Open Agent. Grant macOS Screen Recording and Accessibility permissions when
+   prompted, then restart Agent if macOS asks for a restart.
+3. Open Viewer on the same Mac or another Mac on the same LAN.
+4. Select the discovered Agent, or manually enter the Agent host and port shown
+   in the Agent window.
+5. Enter the 6-character pairing code.
+6. Confirm the Agent screen appears, mouse move/click/scroll work, keyboard
+   input reaches the Agent, and Disconnect returns both sides to idle/pairing.
+
+Android Viewer:
+
+1. Install `DeskMobileViewer-Android-release.apk` on BlueStacks or a physical
+   Android device.
+2. Start the desktop Agent on the same LAN.
+3. Open the Android Viewer and enter the Agent host, port, and pairing code.
+4. Confirm the Agent screen expands to the phone viewport after the WebRTC stream
+   connects.
+
+iOS Viewer through Simulator:
+
+1. Unzip `DeskMobileViewer-iOS-Simulator.zip`.
+2. Boot an iOS Simulator from Xcode.
+3. Install with `xcrun simctl install booted DeskMobileViewer.app` from the
+   unzipped directory.
+4. Start the desktop Agent, open the iOS Viewer, enter host, port, and pairing
+   code, then confirm full-screen streaming.
+
+iOS Viewer through TestFlight:
+
+1. Generate `DeskMobileViewer-iOS-AppStore.ipa` with `pnpm package:ios:ipa` on a
+   signed Apple Developer machine.
+2. Upload the IPA to App Store Connect or Transporter.
+3. Install from TestFlight, connect to the desktop Agent, and run the same
+   full-screen streaming checks as the Simulator path.
 
 Automated E2E coverage:
 

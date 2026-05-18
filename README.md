@@ -2,6 +2,8 @@
 
 LAN-only remote desktop control system built with Electron and WebRTC.
 
+[中文对照](README.zh-CN.md)
+
 ## M1 Milestone
 
 M1 focuses on desktop-to-desktop control on a local network. A Viewer receives the

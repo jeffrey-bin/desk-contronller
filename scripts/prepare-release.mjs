@@ -50,6 +50,7 @@ if (ipa) {
 }
 
 writeFileSync(join(releaseRoot, 'README.md'), createReleaseReadme(), 'utf8')
+writeFileSync(join(releaseRoot, 'README.zh-CN.md'), createChineseReleaseReadme(), 'utf8')
 
 for (const artifact of artifacts) {
   const status = artifact.ready ? 'OK' : 'MISSING'
@@ -156,4 +157,73 @@ function createReleaseReadme() {
     '',
   ]
   return `${lines.join('\n')}\n`
+}
+
+function createChineseReleaseReadme() {
+  const lines = [
+    '# Desk Controller Release Bundle 中文说明',
+    '',
+    `生成来源：${basename(repoRoot)}，生成时间：${new Date().toISOString()}。`,
+    '',
+    '## 安装包',
+    '',
+    ...artifacts.map((artifact) =>
+      artifact.ready
+        ? `- ${toChineseLabel(artifact.label)}：\`${basename(artifact.path)}\``
+        : `- ${toChineseLabel(artifact.label)}：缺失。${toChineseNote(artifact.note)}`.trim(),
+    ),
+    '',
+    '## 桌面端冒烟测试',
+    '',
+    '1. 在同一局域网的 Mac 上解压 `DeskController-Agent-mac-*.zip` 与 `DeskController-Viewer-mac-*.zip`。',
+    '2. 打开 Agent。macOS 弹窗时授予 Screen Recording 与 Accessibility 权限；如果系统要求重启应用，则重启 Agent。',
+    '3. 打开 Viewer，选择自动发现的 Agent，或输入 Agent 的 LAN host 与 port，然后输入 6 位配对码。',
+    '4. 确认远端屏幕出现，鼠标移动、点击、滚轮、键盘输入都能到达 Agent，Disconnect 后两端回到 pairing/idle。',
+    '',
+    '## Android 冒烟测试',
+    '',
+    '1. 在 BlueStacks 或实体 Android 设备安装 `DeskMobileViewer-Android-release.apk`。',
+    '2. 在同一局域网启动桌面 Agent。',
+    '3. 打开 Android Viewer，输入 Agent host、port 与配对码，然后连接。',
+    '4. 串流开始后确认 Agent 屏幕撑满手机视口。',
+    '',
+    '## iOS 冒烟测试',
+    '',
+    'Simulator 路径：',
+    '',
+    '1. 解压 `DeskMobileViewer-iOS-Simulator.zip`。',
+    '2. 启动一个 iOS Simulator。',
+    '3. 在解压目录运行 `xcrun simctl install booted DeskMobileViewer.app`。',
+    '4. 启动桌面 Agent，打开 iOS app，输入 host、port 与配对码，确认全屏串流。',
+    '',
+    'TestFlight/App Store 路径：',
+    '',
+    '1. 在已配置 Apple Distribution 签名的 Mac 上运行 `pnpm package:ios:ipa` 构建已签名 IPA。',
+    '2. 重新运行 `pnpm release:prepare`，脚本会把 `DeskMobileViewer-iOS-AppStore.ipa` 复制到本目录。',
+    '3. 上传 IPA 到 App Store Connect 或 Transporter，再通过 TestFlight 安装测试。',
+    '',
+  ]
+  return `${lines.join('\n')}\n`
+}
+
+function toChineseLabel(label) {
+  return (
+    {
+      'macOS Agent app': 'macOS Agent 应用',
+      'macOS Viewer app': 'macOS Viewer 应用',
+      'Android release APK': 'Android release APK',
+      'iOS Simulator app': 'iOS Simulator 应用',
+      'iOS App Store IPA': 'iOS App Store IPA',
+    }[label] ?? label
+  )
+}
+
+function toChineseNote(note) {
+  if (
+    note ===
+    'Run `pnpm package:ios:ipa` on a Mac with Apple signing credentials, then rerun `pnpm release:prepare`.'
+  ) {
+    return '请在具备 Apple 签名凭据的 Mac 上运行 `pnpm package:ios:ipa`，然后重新运行 `pnpm release:prepare`。'
+  }
+  return note ?? ''
 }

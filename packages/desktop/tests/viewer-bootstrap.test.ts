@@ -13,4 +13,15 @@ describe('viewer bootstrap', () => {
     expect(source).toContain("state === 'connected'")
     expect(source).not.toContain("setConnectionState(message.ok ? 'connected' : 'failed')")
   })
+
+  it('turns a missing Agent socket into Viewer failed state instead of surfacing IPC errors', () => {
+    const source = readFileSync(
+      resolve(import.meta.dirname, '../src/main/viewer/bootstrap.ts'),
+      'utf8',
+    )
+
+    expect(source).toContain('Viewer transport failed to start')
+    expect(source).toContain("await stopTransport('failed')")
+    expect(source).toContain('return')
+  })
 })

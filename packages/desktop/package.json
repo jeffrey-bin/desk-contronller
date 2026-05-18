@@ -7,6 +7,9 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "package": "node scripts/package-desktop.mjs all",
+    "package:agent": "node scripts/package-desktop.mjs agent",
+    "package:viewer": "node scripts/package-desktop.mjs viewer",
     "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
     "lint": "eslint electron.vite.config.ts src tests",
     "test": "vitest run"

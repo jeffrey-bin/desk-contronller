@@ -92,6 +92,42 @@ export default function App(): React.JSX.Element {
   }
 
   const isBusy = snapshot.state !== 'idle' && snapshot.state !== 'failed'
+  const remoteStreamURL = snapshot.stream?.streamURL
+
+  if (remoteStreamURL) {
+    return (
+      <View style={styles.remoteSurface}>
+        <StatusBar hidden />
+        <RTCView
+          testID="remote-video"
+          accessibilityLabel="remote-video"
+          objectFit="contain"
+          streamURL={remoteStreamURL}
+          style={styles.fullscreenVideo}
+          {...(Platform.OS === 'android' ? { zOrder: 1 } : {})}
+        />
+        <View style={styles.remoteOverlay}>
+          <Text testID="status-value" accessibilityLabel={snapshot.state} style={styles.remotePill}>
+            {snapshot.state}
+          </Text>
+          <Pressable
+            testID="disconnect-button"
+            accessibilityRole="button"
+            accessibilityLabel="disconnect-button"
+            onPress={() => {
+              void disconnect()
+            }}
+            style={({ pressed }) => [
+              styles.remoteDisconnectButton,
+              pressed && styles.pressedButton,
+            ]}
+          >
+            <Text style={styles.remoteDisconnectText}>Disconnect</Text>
+          </Pressable>
+        </View>
+      </View>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -333,5 +369,53 @@ const styles = StyleSheet.create({
     color: '#B8C4D6',
     fontSize: 16,
     marginTop: 8,
+  },
+  remoteSurface: {
+    backgroundColor: '#000000',
+    flex: 1,
+  },
+  fullscreenVideo: {
+    backgroundColor: '#000000',
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  remoteOverlay: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    left: 0,
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 52 : 24,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
+  remotePill: {
+    backgroundColor: 'rgba(15, 23, 42, 0.76)',
+    borderColor: 'rgba(255, 255, 255, 0.18)',
+    borderRadius: 18,
+    borderWidth: 1,
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '800',
+    overflow: 'hidden',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  remoteDisconnectButton: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(248, 250, 252, 0.92)',
+    borderRadius: 8,
+    minHeight: 40,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+  },
+  remoteDisconnectText: {
+    color: '#0F172A',
+    fontSize: 14,
+    fontWeight: '800',
   },
 })

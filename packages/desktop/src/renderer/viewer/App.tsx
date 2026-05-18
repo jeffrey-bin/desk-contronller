@@ -43,11 +43,18 @@ export function App(): JSX.Element {
 
   useEffect(() => {
     let mounted = true
-    void api.discoverAgents().then((nextAgents) => {
-      if (mounted) {
-        setAgents(nextAgents)
-      }
-    })
+    void api
+      .discoverAgents()
+      .then((nextAgents) => {
+        if (mounted) {
+          setAgents(nextAgents)
+        }
+      })
+      .catch((discoverError: unknown) => {
+        if (mounted) {
+          setError(discoverError instanceof Error ? discoverError.message : 'Discovery failed')
+        }
+      })
 
     const unsubscribe = api.onEvent((event) => {
       applyEvent(event)

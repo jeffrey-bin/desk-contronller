@@ -15,6 +15,24 @@ describe('resolveMode', () => {
     expect(resolveMode({ env: { APP_MODE: 'banana' }, stored: 'agent' })).toBe('agent')
   })
 
+  it('uses packaged Agent app name before stored mode', () => {
+    expect(resolveMode({ packagedName: 'Desk Controller Agent', stored: 'viewer' })).toBe('agent')
+  })
+
+  it('uses packaged Viewer app name before stored mode', () => {
+    expect(resolveMode({ packagedName: 'Desk Controller Viewer', stored: 'agent' })).toBe('viewer')
+  })
+
+  it('uses packaged executable path before stored mode', () => {
+    expect(
+      resolveMode({
+        packagedName:
+          '/Applications/Desk Controller Agent.app/Contents/MacOS/Desk Controller Agent',
+        stored: 'viewer',
+      }),
+    ).toBe('agent')
+  })
+
   it('falls back to stored viewer', () => {
     expect(resolveMode({ stored: 'viewer' })).toBe('viewer')
   })

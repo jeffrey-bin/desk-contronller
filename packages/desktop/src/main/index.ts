@@ -22,7 +22,8 @@ type MainWindow = Awaited<ReturnType<typeof makeWindow>>
 
 configureRemoteDebugging(app.commandLine)
 
-const envMode = resolveMode({ stored: undefined })
+const packagedName = app.isPackaged ? `${app.getName()} ${process.execPath}` : undefined
+const envMode = resolveMode({ packagedName, stored: undefined })
 const userDataSuffix = resolveUserDataSuffix({ mode: envMode })
 
 if (userDataSuffix !== undefined) {
@@ -31,7 +32,7 @@ if (userDataSuffix !== undefined) {
 
 const store = new Store<DesktopStore>()
 let currentMode: AppMode =
-  envMode === 'welcome' ? resolveMode({ stored: store.get('mode') }) : envMode
+  envMode === 'welcome' ? resolveMode({ packagedName, stored: store.get('mode') }) : envMode
 const mainWindowState: { current: MainWindow | undefined } = { current: undefined }
 let isQuitting = false
 let windowCleanup = Promise.resolve()

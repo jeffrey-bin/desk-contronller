@@ -14,6 +14,7 @@ type BootstrapViewerOptions = {
 }
 
 type ViewerTransport = SignalingTransport
+type ViewerConnectionState = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'failed'
 
 export async function bootstrapViewerMain({ window }: BootstrapViewerOptions): Promise<void> {
   const mdns = new MdnsBrowse({
@@ -24,13 +25,11 @@ export async function bootstrapViewerMain({ window }: BootstrapViewerOptions): P
   let unsubscribers: Array<() => void> = []
   const clientId = crypto.randomUUID()
 
-  function setConnectionState(
-    state: 'idle' | 'connecting' | 'connected' | 'disconnected' | 'failed',
-  ): void {
+  function setConnectionState(state: ViewerConnectionState): void {
     sendViewerEvent(window, { type: 'connection-state', state })
   }
 
-  async function stopTransport(nextState: 'idle' | 'disconnected' = 'idle'): Promise<void> {
+  async function stopTransport(nextState: ViewerConnectionState = 'idle'): Promise<void> {
     const active = transport
     for (const unsubscribe of unsubscribers.splice(0)) {
       unsubscribe()
@@ -71,7 +70,16 @@ export async function bootstrapViewerMain({ window }: BootstrapViewerOptions): P
       }),
     ]
 
-    await nextTransport.start()
+    try {
+      await nextTransport.start()
+    } catch (error) {
+      log.warn('Viewer transport failed to start', error)
+      if (transport === nextTransport) {
+        await stopTransport('failed')
+      }
+      return
+    }
+
     nextTransport.send({ v: PROTOCOL_VERSION, t: 'hello', role: 'viewer', clientId })
     nextTransport.send({ v: PROTOCOL_VERSION, t: 'pair-request', code })
   })

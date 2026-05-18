@@ -13,6 +13,12 @@
     "start:viewer": "pnpm dev:viewer",
     "dev:agent": "APP_MODE=agent pnpm --filter @desk/desktop dev",
     "dev:viewer": "APP_MODE=viewer pnpm --filter @desk/desktop dev",
+    "icons:generate": "node scripts/generate-icons.mjs",
+    "package:desktop": "pnpm icons:generate && pnpm --filter @desk/desktop build && node packages/desktop/scripts/package-desktop.mjs all",
+    "package:desktop:agent": "pnpm icons:generate && pnpm --filter @desk/desktop build && node packages/desktop/scripts/package-desktop.mjs agent",
+    "package:desktop:viewer": "pnpm icons:generate && pnpm --filter @desk/desktop build && node packages/desktop/scripts/package-desktop.mjs viewer",
+    "package:android": "pnpm icons:generate && pnpm --filter @desk/mobile-viewer package:android",
+    "package:ios:sim": "pnpm icons:generate && pnpm --filter @desk/mobile-viewer package:ios:sim",
     "e2e": "pnpm e2e:m1 && pnpm e2e:m1:real",
     "e2e:m1": "pnpm --filter @desk/desktop test -- tests/m1-e2e.test.ts",
     "e2e:m1:real": "pnpm --filter @desk/desktop build && playwright test -c packages/desktop/playwright.config.ts",
@@ -38,6 +44,7 @@
     ]
   },
   "devDependencies": {
+    "@electron/packager": "^20.0.0",
     "@eslint/js": "^9.39.1",
     "@playwright/test": "^1.60.0",
     "@vitest/coverage-v8": "^2.1.0",

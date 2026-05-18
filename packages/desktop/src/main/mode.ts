@@ -3,6 +3,7 @@ export type AppMode = 'agent' | 'viewer' | 'welcome'
 type ModeInput = {
   env?: Record<string, string | undefined>
   stored?: unknown
+  packagedName?: string | undefined
 }
 
 type UserDataSuffixInput = {
@@ -14,9 +15,25 @@ function isPersistedMode(value: unknown): value is Exclude<AppMode, 'welcome'> {
   return value === 'agent' || value === 'viewer'
 }
 
-export function resolveMode({ env = process.env, stored }: ModeInput): AppMode {
+function modeFromPackagedName(value: string | undefined): Exclude<AppMode, 'welcome'> | undefined {
+  const normalized = value?.toLowerCase()
+  if (normalized?.includes('agent')) {
+    return 'agent'
+  }
+  if (normalized?.includes('viewer')) {
+    return 'viewer'
+  }
+  return undefined
+}
+
+export function resolveMode({ env = process.env, stored, packagedName }: ModeInput): AppMode {
   if (isPersistedMode(env.APP_MODE)) {
     return env.APP_MODE
+  }
+
+  const packagedMode = modeFromPackagedName(packagedName)
+  if (packagedMode !== undefined) {
+    return packagedMode
   }
 
   if (isPersistedMode(stored)) {

@@ -1,7 +1,9 @@
 android/.gradle/
+android/app/.cxx/
 android/app/build/
 android/build/
 ios/Pods/
+ios/.xcode.env.local
 ios/build/
 ios/DerivedData/
 *.xcworkspace/xcuserdata/

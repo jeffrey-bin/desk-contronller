@@ -171,9 +171,15 @@ importers:
       '@react-native/babel-preset':
         specifier: 0.85.3
         version: 0.85.3(@babel/core@7.29.0)
+      '@react-native/codegen':
+        specifier: 0.85.3
+        version: 0.85.3(@babel/core@7.29.0)
       '@react-native/community-cli-plugin':
         specifier: 0.85.3
         version: 0.85.3(@react-native-community/cli@20.1.0(typescript@5.9.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.0))
+      '@react-native/gradle-plugin':
+        specifier: 0.85.3
+        version: 0.85.3
       '@react-native/metro-config':
         specifier: 0.85.3
         version: 0.85.3(@babel/core@7.29.0)

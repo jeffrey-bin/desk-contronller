@@ -1,4 +1,4 @@
-package com.deskmobileviewer
+package com.deskcontroller.mobileviewer
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

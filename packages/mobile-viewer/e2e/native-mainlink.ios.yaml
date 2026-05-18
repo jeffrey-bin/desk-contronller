@@ -22,6 +22,7 @@ env:
     id: pair-code-input
 - eraseText
 - inputText: ${PAIR_CODE}
+- hideKeyboard
 - tapOn:
     id: connect-button
 - assertVisible: streaming

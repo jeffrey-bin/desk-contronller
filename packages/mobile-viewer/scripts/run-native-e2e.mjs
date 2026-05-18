@@ -1,11 +1,26 @@
 import { spawn } from 'node:child_process'
+import { existsSync } from 'node:fs'
 import process from 'node:process'
 
 const platform = process.argv[2]
 const packageRoot = new URL('..', import.meta.url).pathname
+const flowFile = `e2e/native-mainlink.${platform}.yaml`
 const port = process.env.DESK_MOBILE_E2E_PORT ?? '49831'
 const pairCode = process.env.DESK_MOBILE_E2E_PAIR_CODE ?? 'RNM2E2'
-const appId = 'com.deskcontroller.mobileviewer'
+const androidAdbConnect = process.env.DESK_ANDROID_ADB_CONNECT ?? '127.0.0.1:5555'
+const androidSdkRoot =
+  process.env.ANDROID_SDK_ROOT ??
+  process.env.ANDROID_HOME ??
+  '/opt/homebrew/share/android-commandlinetools'
+const java17Home = '/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home'
+const baseEnv = {
+  ...process.env,
+  ANDROID_HOME: androidSdkRoot,
+  ANDROID_SDK_ROOT: androidSdkRoot,
+  ...(existsSync(java17Home) || process.env.JAVA_HOME
+    ? { JAVA_HOME: process.env.JAVA_HOME ?? java17Home }
+    : {}),
+}
 
 if (platform !== 'ios' && platform !== 'android') {
   console.error('Usage: node scripts/run-native-e2e.mjs <ios|android>')
@@ -32,6 +47,7 @@ try {
   await waitForOutput(metro, /Welcome to Metro|Dev server ready|ready/i, 30_000)
 
   if (platform === 'android') {
+    await runAllowFailure('adb', ['connect', androidAdbConnect])
     await run('adb', ['reverse', 'tcp:8081', 'tcp:8081'])
     await run('adb', ['reverse', `tcp:${port}`, `tcp:${port}`])
     await run('pnpm', ['exec', 'react-native', 'run-android'])
@@ -39,7 +55,7 @@ try {
     await run('pnpm', ['exec', 'react-native', 'run-ios', '--simulator', 'iPhone 16'])
   }
 
-  await run('maestro', ['test', 'e2e/native-mainlink.yaml'], {
+  await run('maestro', ['test', '--platform', platform, flowFile], {
     HOST: '127.0.0.1',
     PORT: port,
     PAIR_CODE: pairCode,
@@ -55,7 +71,7 @@ try {
 function start(command, args, env = {}) {
   const child = spawn(command, args, {
     cwd: packageRoot,
-    env: { ...process.env, ...env },
+    env: { ...baseEnv, ...env },
     stdio: ['ignore', 'pipe', 'pipe'],
   })
   children.push(child)
@@ -67,7 +83,7 @@ function start(command, args, env = {}) {
 function run(command, args, env = {}) {
   const child = spawn(command, args, {
     cwd: packageRoot,
-    env: { ...process.env, ...env },
+    env: { ...baseEnv, ...env },
     stdio: 'inherit',
   })
   children.push(child)
@@ -79,6 +95,21 @@ function run(command, args, env = {}) {
       } else {
         reject(new Error(`${command} ${args.join(' ')} exited with ${code ?? 'signal'}`))
       }
+    })
+  })
+}
+
+function runAllowFailure(command, args, env = {}) {
+  const child = spawn(command, args, {
+    cwd: packageRoot,
+    env: { ...baseEnv, ...env },
+    stdio: 'inherit',
+  })
+  children.push(child)
+  return new Promise((resolve) => {
+    child.once('exit', () => {
+      children.splice(children.indexOf(child), 1)
+      resolve()
     })
   })
 }

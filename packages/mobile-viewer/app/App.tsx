@@ -101,7 +101,7 @@ export default function App(): React.JSX.Element {
 
         <View style={styles.statusRow}>
           <Text style={styles.label}>Status</Text>
-          <Text testID="status-value" accessibilityLabel="status-value" style={styles.statusPill}>
+          <Text testID="status-value" accessibilityLabel={snapshot.state} style={styles.statusPill}>
             {snapshot.state}
           </Text>
         </View>
